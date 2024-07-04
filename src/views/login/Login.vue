@@ -5,7 +5,7 @@
     <v-form @submit.prevent="handleLogin" ref="form" class="d-flex form-wrapper pa-10 elevation-2">
       <div class="form-title d-flex">
         <h2 class="d-flex">
-          <v-icon color="blue-darken-3" size="31">mdi-email-outline</v-icon>
+          <v-icon color="blue-darken-3" size="22">mdi-email-outline</v-icon>
           <span class="ml-1">Mail Box</span>
         </h2>
         <p>Login on your account</p>
@@ -197,12 +197,12 @@ export default {
   }
 
   .form-title h2{
-      font-size: 1.625rem;
+      font-size: 1.125rem;
       align-items: center
   }
 
   .form-title p{
-      font-size: .875rem;
+      font-size: .8125rem;
   }
 
   .login-btn {
