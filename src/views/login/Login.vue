@@ -69,77 +69,86 @@
 import api from "../../lib/axios"
 import { useToast } from "vue-toastification";
 import { RouterLink } from "vue-router";
+import Cookies from 'js-cookie'
 
-  export default {
-    name: 'Login',
-    setup() {
-      const toast = useToast();
+export default {
+  name: 'Login',
+  setup() {
+    const toast = useToast();
 
-      return { toast };
-    },
-    data() {
-      return {
-        showPassword: false,
-        loadingLogin: false,
-        formFields: {
-          email: '',
-          password: ''
+    return { toast };
+  },
+  data() {
+    return {
+      showPassword: false,
+      loadingLogin: false,
+      formFields: {
+        email: '',
+        password: ''
+      },
+      emailRules: [
+        value => {
+          if (/^(([^<>()[\]\\.,;:\s@']+(\.[^<>()\\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value)) return true
+          return 'Invalid e-mail.'
         },
-        emailRules: [
-          value => {
-            if (/^(([^<>()[\]\\.,;:\s@']+(\.[^<>()\\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value)) return true
-            return 'Invalid e-mail.'
-          },
-        ],
-        passwordRules: [
-          value => {
-            if(value.length > 5) return true
+      ],
+      passwordRules: [
+        value => {
+          if(value.length > 5) return true
 
-            return 'Password must have at least 6 characters.'
-          }
-        ]
-      }
-    },
-    computed: {
-      iconPassword() {
-        return this.showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
-      }
-    },
-    methods: {
-      async handleLogin() {
-        const { valid } = await this.$refs.form.validate()
-
-          if(!valid) return
-
-          this.loadingLogin = true
-
-         try {
-          const doLogin = await api.post("/user/login", {
-            email: this.formFields.email,
-            password: this.formFields.password
-          })
-
-          const authToken = doLogin.data.authToken
-
-          this.$refs.form.reset()
-        } catch(e) {
-          console.error("Error on login... Try again.")
-          this.toast.error(e.response.data.message);
-        } finally {
-          this.loadingLogin = false
+          return 'Password must have at least 6 characters.'
         }
-      },
-      resetForm() {
-        this.formFields = {
-          email: '',
-          password: ''
-        }
-      },
-      togglePasswordShow() {
-        this.showPassword = !this.showPassword
+      ]
+    }
+  },
+  computed: {
+    iconPassword() {
+      return this.showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
+    }
+  },
+  methods: {
+    async handleLogin() {
+      const { valid } = await this.$refs.form.validate()
+
+      if(!valid) return
+
+      this.loadingLogin = true
+
+      try {
+        const doLogin = await api.post("/user/login", {
+          email: this.formFields.email,
+          password: this.formFields.password
+        })
+
+        const authToken = doLogin.data.authToken
+
+        this.resetForm()
+        this.setAuthCookie(authToken)
+        this.redirectToHome()
+      } catch(e) {
+        console.error("Error on login... Try again.")
+        this.toast.error('Wrong credentials!');
+      } finally {
+        this.loadingLogin = false
       }
     },
-  }
+    resetForm() {
+      this.formFields = {
+        email: '',
+        password: ''
+      }
+    },
+    togglePasswordShow() {
+      this.showPassword = !this.showPassword
+    },
+    setAuthCookie(authToken) {
+      Cookies.set('mail-box-auth', authToken, { path: '/', expires: 7 })
+    },
+    redirectToHome() {
+      this.$router.push({ name: 'home' })
+    }
+  },
+}
 </script>
 
 <style scoped>
