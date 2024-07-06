@@ -1,7 +1,8 @@
 export const state = {
   auth: {
     token: null,
-  } as { token: string | null },
+    subject: null,
+  } as { token: string | null, subject: number | null },
   profile: {
     id: null,
     email: null,

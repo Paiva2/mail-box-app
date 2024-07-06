@@ -40,12 +40,12 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _, next) => {
   const publicRoutes: RouteRecordNameGeneric[] = ['login', 'register', 'forgot-password']
 
   store.commit(MutationTypes.LOGIN.SET_AUTH)
 
-  if (!publicRoutes.includes(to.name) && !store.getters.isUserAuth) {
+  if (!publicRoutes.includes(to.name) && (!store.getters.isUserAuth || !store.getters.userId)) {
     return next({ name: 'login' })
   }
 

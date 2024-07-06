@@ -127,7 +127,7 @@ export default {
 
         this.resetForm()
         this.setAuthCookie(authToken)
-        await this.redirectToHome()
+        this.redirectToHome()
       } catch(e) {
         console.error("Error on login... Try again.")
         this.toast.error('Wrong credentials!');
@@ -146,10 +146,9 @@ export default {
     },
     setAuthCookie(authToken) {
       Cookies.set('mail-box-auth', authToken, { path: '/', expires: 7 })
-    },
-    async redirectToHome() {
       this.$store.commit(MutationTypes.LOGIN.SET_AUTH)
-      await this.$store.dispatch(ActionTypes.SET_PROFILE, this.auth)
+    },
+    redirectToHome() {
       this.$router.push({ name: 'home' })
     }
   },
