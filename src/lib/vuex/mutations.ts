@@ -5,7 +5,7 @@ import Cookies from 'js-cookie'
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 
 export const mutations: MutationTree<State> = {
-  [MutationTypes.LOGIN.SET_AUTH](state, _) {
+  [MutationTypes.LOGIN.SET_AUTH](state) {
     const authToken = Cookies.get('mail-box-auth') || null
     let subject = null
 
@@ -21,6 +21,14 @@ export const mutations: MutationTree<State> = {
     }
 
     state.auth = { ...state.auth, token: authToken, subject }
+  },
+  [MutationTypes.LOGIN.SET_LOGOUT](state) {
+    Cookies.remove('mail-box-auth')
+
+    state.auth =  {
+      token: null,
+      subject: null,
+    }
   },
   [MutationTypes.USER.SET_PROFILE](state, payload) {
     state.profile = {

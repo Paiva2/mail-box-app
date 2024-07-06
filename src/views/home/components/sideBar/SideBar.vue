@@ -2,8 +2,8 @@
   <v-navigation-drawer
     expand-on-hover
     elevation="1"
-    rail
     permanent
+    rail
   >
     <v-list>
       <v-list-item
@@ -76,5 +76,4 @@ import { mapState } from 'vuex'
 </script>
 
 <style scoped>
-
 </style>

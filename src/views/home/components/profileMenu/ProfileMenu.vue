@@ -4,13 +4,22 @@
       v-model="profileMenu.open"
     >
       <v-card class="pa-5 menu-container">
-        <div class="d-flex">
+        <div class="d-flex actions-btns">
           <v-btn
             @click="closeMenu"
             icon="mdi-arrow-left"
             color="blue-darken-3"
             size="40"
           />
+
+          <v-btn
+            class="logout"
+            @click="logout"
+            color="red-darken-4"
+          >
+            Logout
+            <v-icon class="ml-2">mdi-logout</v-icon>
+          </v-btn>
         </div>
         <v-form @submit.prevent="" ref="form" class="d-flex form-wrapper pa-10 h-100">
 
@@ -95,7 +104,6 @@
 
           <div class="actions-wrapper d-flex w-100 justify-end">
             <v-btn
-            type="submit"
             color="grey-darken-1 mt-8"
             rounded="0"
             @click="closeMenu"
@@ -118,6 +126,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { MutationTypes } from '@/lib/vuex/types/mutation-types'
 
   export default {
     name: 'ProfileMenu',
@@ -161,6 +170,10 @@ import { mapState } from 'vuex'
       closeMenu() {
         this.$emit('close-menu')
       },
+      logout() {
+        this.$store.commit(MutationTypes.LOGIN.SET_LOGOUT)
+        this.$router.push({ name: 'login' })
+      },
       fillDefaultValues() {
         this.formFields = {
           name: this.profile.name,
@@ -183,6 +196,15 @@ import { mapState } from 'vuex'
 <style scoped>
   .menu-container {
     background-color: #ECEFF1;
+  }
+
+  .actions-btns {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .actions-btns .logout {
+    width: fit-content;
   }
 
   .form-wrapper {
