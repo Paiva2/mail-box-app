@@ -1,7 +1,9 @@
-import { createRouter, createWebHistory } from "vue-router"
+import { createRouter, createWebHistory, RouteRecordNameGeneric } from "vue-router"
 import Login from '@/views/login/Login.vue'
 import Home from "@/views/home/Home.vue"
 import Register from "@/views/register/Register.vue"
+import { store } from "../lib/vuex/store"
+import { MutationTypes } from "../lib/vuex/types/mutation-types"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -10,26 +12,15 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: Home,
-      beforeEnter: (to, from, next) => {
-        // const isAuth = true
-
-        // if(!isAuth) {
-        //   return next({ name: 'login' })
-        // }
-
-        next()
-      }
     },
     {
       path: '/login',
       name: 'login',
       component: Login,
       beforeEnter: (to, from, next) => {
-        // const isAuth = false
-
-        // if (isAuth) {
-        //   return next({ name: 'home' })
-        // }
+        if (store.getters.isUserAuth) {
+          return next({ name: 'home' })
+        }
 
         next()
       }
@@ -37,10 +28,28 @@ const router = createRouter({
     {
       path: '/register',
       name: 'register',
-      component: Register
+      component: Register,
+      beforeEnter: (to, from, next) => {
+        if (store.getters.isUserAuth) {
+          return next({ name: 'home' })
+        }
+
+        next()
+      }
     },
   ]
 })
 
+router.beforeEach((to, from, next) => {
+  const publicRoutes: RouteRecordNameGeneric[] = ['login', 'register', 'forgot-password']
+
+  store.commit(MutationTypes.LOGIN.SET_AUTH)
+
+  if (!publicRoutes.includes(to.name) && !store.getters.isUserAuth) {
+    return next({ name: 'login' })
+  }
+
+  next()
+})
 
 export default router

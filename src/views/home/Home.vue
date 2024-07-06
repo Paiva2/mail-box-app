@@ -1,15 +1,21 @@
 <template>
   <div>
     Home
+    Auth as: {{ profile.name }}
   </div>
 </template>
 
 <script>
-  export default {
-    name: 'Home'
+import { mapState } from 'vuex'
+
+export default {
+  name: 'Home',
+  computed: {
+    ...mapState(['profile'])
   }
+}
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
 </style>

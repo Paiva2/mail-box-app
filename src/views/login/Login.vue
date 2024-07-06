@@ -68,8 +68,10 @@
 <script>
 import api from "../../lib/axios"
 import { useToast } from "vue-toastification";
-import { RouterLink } from "vue-router";
 import Cookies from 'js-cookie'
+import { mapState } from 'vuex'
+import { MutationTypes } from '@/lib/vuex/types/mutation-types'
+import { ActionTypes } from '@/lib/vuex/types/action-types'
 
 export default {
   name: 'Login',
@@ -102,9 +104,10 @@ export default {
     }
   },
   computed: {
+    ...mapState(['auth']),
     iconPassword() {
       return this.showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
-    }
+    },
   },
   methods: {
     async handleLogin() {
@@ -124,7 +127,7 @@ export default {
 
         this.resetForm()
         this.setAuthCookie(authToken)
-        this.redirectToHome()
+        await this.redirectToHome()
       } catch(e) {
         console.error("Error on login... Try again.")
         this.toast.error('Wrong credentials!');
@@ -144,7 +147,9 @@ export default {
     setAuthCookie(authToken) {
       Cookies.set('mail-box-auth', authToken, { path: '/', expires: 7 })
     },
-    redirectToHome() {
+    async redirectToHome() {
+      this.$store.commit(MutationTypes.LOGIN.SET_AUTH)
+      await this.$store.dispatch(ActionTypes.SET_PROFILE, this.auth)
       this.$router.push({ name: 'home' })
     }
   },
