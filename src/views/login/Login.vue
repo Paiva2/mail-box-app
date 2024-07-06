@@ -146,7 +146,6 @@ export default {
     },
     setAuthCookie(authToken) {
       Cookies.set('mail-box-auth', authToken, { path: '/', expires: 7 })
-      this.$store.commit(MutationTypes.LOGIN.SET_AUTH)
     },
     redirectToHome() {
       this.$router.push({ name: 'home' })

@@ -23,6 +23,9 @@ export const mutations: MutationTree<State> = {
     state.auth = { ...state.auth, token: authToken, subject }
   },
   [MutationTypes.USER.SET_PROFILE](state, payload) {
-    state.profile = payload
+    state.profile = {
+      ...state.profile,
+      ...payload
+    }
   },
 }

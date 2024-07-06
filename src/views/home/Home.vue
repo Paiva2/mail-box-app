@@ -1,17 +1,19 @@
 <template>
   <div>
-    Home
-    Auth as: {{ profile.name }}
-    <v-btn @click="$router.push({name: 'test'})">vai</v-btn>
+    <side-bar />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import { ActionTypes } from '@/lib/vuex/types/action-types'
+import SideBar from './components/sideBar/SideBar'
 
 export default {
   name: 'Home',
+  components: {
+    SideBar
+  },
   computed: {
     ...mapState(['profile']),
   },
