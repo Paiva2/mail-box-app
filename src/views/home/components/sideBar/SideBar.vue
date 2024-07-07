@@ -12,7 +12,15 @@
         :subtitle="profile.email"
         :title="profile.name"
         @click="handleProfileMenu"
-      />
+      >
+        <v-tooltip
+          activator="parent"
+          location="end"
+          offset="-4"
+        >
+          Edit Profile
+        </v-tooltip>
+      </v-list-item>
     </v-list>
 
     <v-divider></v-divider>
@@ -26,6 +34,19 @@
         :value="item.value"
         @click="selectedMenu = item.value"
         :active="selectedMenu === item.value"
+      />
+    </v-list>
+
+    <v-divider></v-divider>
+
+    <v-list density="compact" nav color="blue-darken-3">
+      <v-list-item
+        class="py-2"
+        prepend-icon="mdi-account-box"
+        title="Contacts"
+        value="contacts"
+        :active="selectedMenu === 'contacts'"
+        @click="selectedMenu = 'contacts'"
       />
     </v-list>
 

@@ -116,6 +116,7 @@ export default {
       if(!valid) return
 
       this.loadingLogin = true
+      this.toast.clear()
 
       try {
         const doLogin = await api.post("/user/login", {

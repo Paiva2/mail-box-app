@@ -10,19 +10,20 @@
             icon="mdi-arrow-left"
             color="blue-darken-3"
             size="40"
+            :disabled="loadingUpdate"
           />
 
           <v-btn
             class="logout"
             @click="logout"
             color="red-darken-4"
+            :disabled="loadingUpdate"
           >
             Logout
             <v-icon class="ml-2">mdi-logout</v-icon>
           </v-btn>
         </div>
-        <v-form @submit.prevent="" ref="form" class="d-flex form-wrapper pa-10 h-100">
-
+        <v-form @submit.prevent="handleUpdate" ref="form" class="d-flex form-wrapper pa-10 h-100">
           <div>
             <div class="form-title d-flex">
               <h2 class="d-flex">
@@ -33,8 +34,8 @@
             <div class="fields-wrapper d-flex pa-0">
               <span class="profile-picture">
                 <label class="profile-input-label">
-                  <input class="profile-input" type="file" />
-                  <img :src="formFields.profilePicture" />
+                  <input @change="changeProfilePicture" class="profile-input" type="file" />
+                  <img :src="handleProfilePictureToShow" />
                   <div class="profile-icon"></div>
                 </label>
               </span>
@@ -60,6 +61,7 @@
                 color="blue-darken-3"
                 validate-on="submit"
                 v-model="formFields.email"
+                :rules="emailRules"
               />
 
               <v-text-field
@@ -70,6 +72,8 @@
                 color="blue-darken-3"
                 validate-on="submit"
                 hint="Use a password with more than 6 characters"
+                :rules="passwordRules"
+                v-model="formFields.password"
               >
                 <template v-slot:append-inner>
                   <v-btn
@@ -89,6 +93,8 @@
                 validate-on="submit"
                 :type="showConfirmPassword ? 'text' : 'password'"
                 hint="Must match the password above"
+                :rules="confirmPasswordRules"
+                v-model="formFields.confirmPassword"
               >
                 <template v-slot:append-inner>
                   <v-btn
@@ -104,17 +110,19 @@
 
           <div class="actions-wrapper d-flex w-100 justify-end">
             <v-btn
-            color="grey-darken-1 mt-8"
-            rounded="0"
-            @click="closeMenu"
+              color="grey-darken-1 mt-8"
+              rounded="0"
+              @click="closeMenu"
+              :disabled="loadingUpdate"
             >
               Cancel
             </v-btn>
 
             <v-btn
-            type="submit"
-            color="blue-darken-3 mt-8"
-            rounded="0"
+              type="submit"
+              color="blue-darken-3 mt-8"
+              rounded="0"
+              :disabled="loadingUpdate"
             >
               Save
             </v-btn>
@@ -127,70 +135,178 @@
 <script>
 import { mapState } from 'vuex'
 import { MutationTypes } from '@/lib/vuex/types/mutation-types'
+import { ActionTypes } from '@/lib/vuex/types/action-types'
+import api from '@/lib/axios'
+import { useToast } from "vue-toastification";
+import { AxiosError } from 'axios'
 
-  export default {
-    name: 'ProfileMenu',
-    props: {
-      profileMenu: {
-        type: Object,
-        required: true
-      }
-    },
-    data() {
-      return {
-        formFields: {
-          name: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          profilePicture: ''
+export default {
+  name: 'ProfileMenu',
+  props: {
+    profileMenu: {
+      type: Object,
+      required: true
+    }
+  },
+  setup() {
+    const toast = useToast();
+
+    return { toast };
+  },
+  data() {
+    return {
+      formFields: {
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        profilePicture: ''
+      },
+      showPassword: false,
+      showConfirmPassword: false,
+      loadingUpdate: false,
+      emailRules: [
+        (value) => {
+          const emailRegex = /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()\\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          if (emailRegex.test(value)) return true
+          return 'Invalid e-mail.'
         },
-        showPassword: false,
-        showConfirmPassword: false,
-      }
-    },
-    mounted() {
-      this.fillDefaultValues()
-    },
-    watch: {
-      'profile': function () {
-        this.fillDefaultValues()
-      }
-    },
-    computed: {
-      ...mapState(['profile']),
-      iconPassword() {
-        return this.showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
-      },
-      iconConfirmPassword() {
-        return this.showConfirmPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
-      },
-    },
-    methods: {
-      closeMenu() {
-        this.$emit('close-menu')
-      },
-      logout() {
-        this.$store.commit(MutationTypes.LOGIN.SET_LOGOUT)
-        this.$router.push({ name: 'login' })
-      },
-      fillDefaultValues() {
-        this.formFields = {
-          name: this.profile.name,
-          email: this.profile.email,
-          password: '',
-          confirmPassword: '',
-          profilePicture: this.profile.profilePicture || this.profile.defaultProfilePicture
+      ],
+      passwordRules: [
+        (value) => {
+          if (value === '') return true
+          if (value !== '' && value?.length > 5) return true
+          return 'Password must have at least 6 characters.'
         }
-      },
-      toggleShowPassword() {
-        this.showPassword = !this.showPassword
-      },
-      toggleShowConfirmPassword() {
-        this.showConfirmPassword = !this.showConfirmPassword
+      ],
+      confirmPasswordRules: [
+          (value) => {
+          if (this.formFields.password === '') return true
+          if (value === '') return "Password confirmation can't be empty"
+          if (value === this.formFields.password) return true
+          return 'Password confirmation must match password.'
+        }
+      ],
+    }
+  },
+  mounted() {
+    this.fillDefaultValues()
+  },
+  watch: {
+    'profile': function () {
+      this.fillDefaultValues()
+    }
+  },
+  computed: {
+    ...mapState(['profile', 'auth']),
+    iconPassword() {
+      return this.showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
+    },
+    iconConfirmPassword() {
+      return this.showConfirmPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
+    },
+    handleProfilePictureToShow() {
+      if (!this.formFields.profilePicture) {
+        return this.profile.profilePicture || this.profile.defaultProfilePicture
       }
+
+      return URL.createObjectURL(this.formFields.profilePicture)
+    },
+  },
+  methods: {
+    async handleUpdate() {
+      const { valid } = await this.$refs.form.validate()
+
+      if (!valid) return
+
+      this.loadingUpdate = true
+      this.toast.clear()
+
+      try {
+        const body = await this.handleBodyDefaults()
+
+        if (!body.password && !body.email && !body.profilePicture) return
+
+        await api.patch('/user/update', body, {
+          headers: {
+            Authorization: `Bearer ${this.auth.token}`
+          }
+        })
+
+        this.refreshProfile()
+        this.toast.success('Updated successfully!');
+      } catch (e) {
+        console.error(e)
+
+        if(e instanceof AxiosError) {
+          console.error(e)
+
+          if (e.response.status === 409) {
+            return this.toast.error('E-mail already being used!');
+          }
+        }
+
+        this.toast.error('Error while updating... Try again.');
+      } finally {
+        this.loadingUpdate = false
+      }
+    },
+    closeMenu() {
+      this.$emit('close-menu')
+    },
+    logout() {
+      this.$store.commit(MutationTypes.LOGIN.SET_LOGOUT)
+      this.$router.push({ name: 'login' })
+    },
+    fillDefaultValues() {
+      this.formFields = {
+        ...this.formFields,
+        name: this.profile.name,
+        email: this.profile.email,
+      }
+    },
+    toggleShowPassword() {
+      this.showPassword = !this.showPassword
+    },
+    toggleShowConfirmPassword() {
+      this.showConfirmPassword = !this.showConfirmPassword
+    },
+    changeProfilePicture(event) {
+      //this.formFields.profilePicture = event?.target?.files[0];
+    },
+    async handleBodyDefaults() {
+      const body = {}
+
+      if (this.formFields.email !== this.profile.email) {
+        body.email = this.formFields.email
+      }
+
+      if (this.formFields.password !== '') {
+        body.password = this.formFields.password
+      }
+
+      // TODO
+      if (this.formFields.profilePicture !== '') {
+        const multipartFile = new FormData();
+
+        multipartFile.append("file", this.formFields.profilePicture);
+
+        const uploadImage = await api.post("/user/picture", multipartFile, {
+          headers: {
+            Authorization: `Bearer ${this.auth.token}`
+          }
+        });
+
+        body.profilePicture = uploadImage.data.url;
+      }
+
+      return body
+    },
+    refreshProfile() {
+      this.$store.dispatch(ActionTypes.SET_PROFILE)
     }
   }
+}
 </script>
 
 <style scoped>
