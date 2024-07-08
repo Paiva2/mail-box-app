@@ -5,8 +5,13 @@ import { ActionTypes } from './types/action-types'
 import { MutationTypes } from './types/mutation-types'
 import Cookies from 'js-cookie'
 
+interface ActionDefault {
+  commit: Function,
+  state: State
+}
+
 export const actions = {
-  async [ActionTypes.SET_PROFILE]({ commit, state }: { commit: Function, state: State }) {
+  async [ActionTypes.SET_PROFILE]({ commit, state }: ActionDefault) {
     try {
       const profile = await api.get('/user/profile', {
         headers: {

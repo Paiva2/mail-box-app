@@ -12,11 +12,12 @@ import { RouterView } from 'vue-router';
 import SideBar from '@/components/sideBar/SideBar'
 import { MutationTypes } from '@/lib/vuex/types/mutation-types'
 import { mapState, mapGetters } from 'vuex'
+import Stomp from 'stompjs'
+import SockJS from "sockjs-client/dist/sockjs"
 
 export default {
   name: 'App',
   computed: {
-    ...mapState(['auth']),
     ...mapGetters(['isUserAuth'])
   },
   created() {
@@ -29,3 +30,14 @@ export default {
   }
 }
 </script>
+
+<style>
+  body {
+    font-family: 'Open Sans', 'sans-serif';
+    box-sizing: border-box
+  }
+
+  * {
+    letter-spacing: normal !important;
+  }
+</style>

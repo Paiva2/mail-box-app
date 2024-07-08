@@ -5,5 +5,6 @@ export const MutationTypes = {
   },
   USER: {
     SET_PROFILE: 'SET_PROFILE'
-  }
+  },
+  SET_STOMP_CLIENT: 'SET_STOMP_CLIENT'
 }

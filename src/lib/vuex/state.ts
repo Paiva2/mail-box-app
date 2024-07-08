@@ -1,3 +1,5 @@
+import { CompatClient } from "@stomp/stompjs"
+
 export const state = {
   auth: {
     token: null,
@@ -11,7 +13,8 @@ export const state = {
     defaultProfilePicture: 'https://i.pinimg.com/736x/09/21/fc/0921fc87aa989330b8d403014bf4f340.jpg',
     role: null,
     createdAt: null
-  }
+  },
+  stompClient: null as null | CompatClient
 }
 
 export type State = typeof state

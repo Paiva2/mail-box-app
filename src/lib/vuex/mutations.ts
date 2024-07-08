@@ -7,7 +7,7 @@ import { jwtDecode, JwtPayload } from 'jwt-decode';
 export const mutations: MutationTree<State> = {
   [MutationTypes.LOGIN.SET_AUTH](state) {
     const authToken = Cookies.get('mail-box-auth') || null
-    let subject = null
+    let subject: null | number = null
 
     if (authToken != null) {
       try {
@@ -36,4 +36,7 @@ export const mutations: MutationTree<State> = {
       ...payload
     }
   },
+  [MutationTypes.SET_STOMP_CLIENT](state, payload) {
+    state.stompClient = payload
+  }
 }

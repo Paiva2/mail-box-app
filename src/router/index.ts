@@ -49,6 +49,12 @@ router.beforeEach((to, _, next) => {
     return next({ name: 'login' })
   }
 
+  if (publicRoutes.includes(to.name) && store.state.stompClient != null) {
+    store.state.stompClient.disconnect()
+
+    store.commit(MutationTypes.SET_STOMP_CLIENT, null)
+  }
+
   next()
 })
 
