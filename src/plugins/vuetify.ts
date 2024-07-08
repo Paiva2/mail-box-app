@@ -7,10 +7,11 @@ export default createVuetify({
     defaultTheme: 'light',
     themes: {
       light: {
+        dark: false,
         colors: {
-          background: "#ECEFF1"
+          background: "#ECEFF1",
         }
-      }
+      },
     }
   },
 })

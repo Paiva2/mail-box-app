@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <v-main>
+      <side-bar v-if="isUserAuth" />
       <router-view />
     </v-main>
   </v-app>
@@ -8,15 +9,17 @@
 
 <script>
 import { RouterView } from 'vue-router';
+import SideBar from '@/components/sideBar/SideBar'
 import { MutationTypes } from '@/lib/vuex/types/mutation-types'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'App',
   computed: {
     ...mapState(['auth']),
+    ...mapGetters(['isUserAuth'])
   },
-  async created() {
+  created() {
     this.fillAuthToken()
   },
   methods: {

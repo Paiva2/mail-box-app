@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordNameGeneric } from "vue-router"
 import Login from '@/views/login/Login.vue'
-import Home from "@/views/home/Home.vue"
+import Inbox from "@/views/inbox/Inbox.vue"
 import Register from "@/views/register/Register.vue"
 import { store } from "../lib/vuex/store"
 import { MutationTypes } from "../lib/vuex/types/mutation-types"
@@ -11,7 +11,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: Home,
+      component: Inbox,
     },
     {
       path: '/login',
