@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory, RouteRecordNameGeneric } from "vue-router"
-import Login from '@/views/login/Login.vue'
-import Inbox from "@/views/inbox/Inbox.vue"
-import Register from "@/views/register/Register.vue"
 import { store } from "../lib/vuex/store"
 import { MutationTypes } from "../lib/vuex/types/mutation-types"
+import Login from '@/views/login/Login.vue'
+import Email from "@/views/email/Email.vue"
+import Register from "@/views/register/Register.vue"
+import EmailFallback from "../components/emailFallback/EmailFallback.vue"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -11,7 +12,12 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: Inbox,
+      component: EmailFallback,
+    },
+    {
+      path: '/mail/:emailId',
+      name: 'email',
+      component: Email,
     },
     {
       path: '/login',

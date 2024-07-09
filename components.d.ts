@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     EmailActonBar: typeof import('./src/components/emailActionBar/EmailActonBar.vue')['default']
     EmailFallback: typeof import('./src/components/emailFallback/EmailFallback.vue')['default']
+    EmailList: typeof import('./src/components/emailList/EmailList.vue')['default']
     EmailPreview: typeof import('./src/components/emailPreview/EmailPreview.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     ProfileMenu: typeof import('./src/components/profileMenu/ProfileMenu.vue')['default']

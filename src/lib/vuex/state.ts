@@ -14,7 +14,9 @@ export const state = {
     role: null,
     createdAt: null
   },
-  stompClient: null as null | CompatClient
+  stompClient: null as null | CompatClient,
+  loadingEmailList: false,
+  selectedEmailId: '',
 }
 
 export type State = typeof state
