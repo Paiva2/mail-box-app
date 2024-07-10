@@ -4,7 +4,7 @@ import { MutationTypes } from "../lib/vuex/types/mutation-types"
 import Login from '@/views/login/Login.vue'
 import Email from "@/views/email/Email.vue"
 import Register from "@/views/register/Register.vue"
-import EmailFallback from "../components/emailFallback/EmailFallback.vue"
+import HomeArea from "@/views/homeArea/HomeArea.vue"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -12,7 +12,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: EmailFallback,
+      component: HomeArea,
     },
     {
       path: '/mail/:emailId',
@@ -23,25 +23,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: Login,
-      beforeEnter: (to, from, next) => {
-        if (store.getters.isUserAuth) {
-          return next({ name: 'home' })
-        }
-
-        next()
-      }
     },
     {
       path: '/register',
       name: 'register',
       component: Register,
-      beforeEnter: (to, from, next) => {
-        if (store.getters.isUserAuth) {
-          return next({ name: 'home' })
-        }
-
-        next()
-      }
     },
   ]
 })
@@ -50,6 +36,10 @@ router.beforeEach((to, _, next) => {
   const publicRoutes: RouteRecordNameGeneric[] = ['login', 'register', 'forgot-password']
 
   store.commit(MutationTypes.LOGIN.SET_AUTH)
+
+  if (publicRoutes.includes(to.name) && store.getters.isUserAuth) {
+    return next({ name: 'home' })
+  }
 
   if (!publicRoutes.includes(to.name) && (!store.getters.isUserAuth || !store.getters.userId)) {
     return next({ name: 'login' })
