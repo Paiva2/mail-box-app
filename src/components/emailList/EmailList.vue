@@ -95,6 +95,9 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-
+<style scoped>
+  .mail-button >>> .v-btn__content {
+    min-width: 100%;
+    justify-content: start;
+  }
 </style>

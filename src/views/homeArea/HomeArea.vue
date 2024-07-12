@@ -21,8 +21,6 @@ export default {
   },
   async created() {
     await this.setProfile()
-  },
-  async mounted() {
     this.makeConnectionInbox()
   },
   methods: {

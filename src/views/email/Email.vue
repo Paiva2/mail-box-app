@@ -31,7 +31,7 @@
               <span class="text-body-2 text-grey-darken-1 font-weight-regular to-list">
                 <span class="text-grey-darken-1">To: </span>
 
-                <template v-for="(receiving) in email.usersReceiving.join(', ')" :key="receiving">
+                <template v-for="(receiving) in email.usersReceiving?.join(', ')" :key="receiving">
                   {{ receiving }}
                 </template>
               </span>
@@ -116,6 +116,7 @@ export default {
     this.$watch(
       () => this.$route.params.emailId,
       async (newId) => {
+        this.email = {}
         await this.fetchEmail(newId);
       }
     )

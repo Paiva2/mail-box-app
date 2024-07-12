@@ -20,6 +20,7 @@
 import { RouterView } from 'vue-router';
 import { MutationTypes } from '@/lib/vuex/types/mutation-types'
 import { mapGetters } from 'vuex'
+import { ActionTypes } from '@/lib/vuex/types/action-types'
 import EmailActionBar from '@/components/emailActionBar/EmailActonBar'
 import EmailList from '@/components/emailList/EmailList'
 import SideBar from '@/components/sideBar/SideBar'
@@ -35,12 +36,16 @@ export default {
   computed: {
     ...mapGetters(['isUserAuth'])
   },
-  created() {
-    this.fillAuthToken()
+  async created() {
+    await this.fillAuthToken()
   },
   methods: {
-    fillAuthToken() {
+    async fillAuthToken() {
       this.$store.commit(MutationTypes.LOGIN.SET_AUTH)
+
+      if (this.isUserAuth) {
+        await this.$store.dispatch(ActionTypes.SET_PROFILE)
+      }
     },
   }
 }

@@ -2,7 +2,7 @@
   <v-app-bar :elevation="1" height="43">
     <div class="d-flex actions-wrapper">
       <div class="actions d-flex">
-        <v-btn tile>
+        <v-btn @click="openNewEmailForm" tile>
           <v-icon color="blue-darken-1" class="mr-1">
             mdi-email
           </v-icon>
@@ -37,13 +37,32 @@
         <v-btn class="search-trigger" tile icon="mdi-magnify" />
       </div>
     </div>
+
+    <new-email :key="newEmailForm.open" :newEmailForm="newEmailForm" />
   </v-app-bar>
 </template>
 
 <script>
-  export default {
-    name: 'EmailActionBar'
+import NewEmail from '@/components/newEmail/NewEmail'
+
+export default {
+  name: 'EmailActionBar',
+  components: {
+    NewEmail
+  },
+  data() {
+    return {
+      newEmailForm: {
+        open: false
+      }
+    }
+  },
+  methods: {
+    openNewEmailForm() {
+      this.newEmailForm.open = true
+    }
   }
+}
 </script>
 
 <style scoped>
@@ -69,4 +88,5 @@
     max-width: 35%;
     justify-content: flex-end;
   }
-</style>
+</style>import NewEmailVue from '../newEmail/NewEmail.vue';
+
