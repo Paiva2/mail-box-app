@@ -13,7 +13,7 @@
           :disabled="loading"
         />
       </div>
-      <v-form @submit.prevent="handleNewEmail" ref="form" class="d-flex form-wrapper pa-10 pt-5 h-100">
+      <v-form @submit.prevent="handleNewEmail(false)" ref="form" class="d-flex form-wrapper pa-10 pt-5 pb-4">
         <div class="input-area d-flex">
           <div class="form-title d-flex">
             <h2 class="d-flex">
@@ -95,7 +95,7 @@
             >
               <span>Opening orders: </span>
               <v-switch
-                class="ml-3"
+                class="ml-5"
                 variant="underlined"
                 color="blue-darken-3"
                 v-model="formFields.openingOrder"
@@ -119,8 +119,8 @@
               clear-icon="mdi-close-circle"
               base-color="blue-darken-3"
               bg-color="white"
-              class="mail-text-area mt-5"
-              rows="10"
+              class="mail-text-area mt-2"
+              rows="7"
               validate-on="submit"
               v-model="formFields.message"
               :rules="messageRules"
@@ -133,6 +133,7 @@
 
         <div class="actions-wrapper d-flex w-100 justify-end">
           <v-btn
+            type="button"
             color="grey-darken-1 mt-8"
             rounded="0"
             @click="closeMenu"
@@ -142,11 +143,12 @@
           </v-btn>
 
           <v-btn
-            type="submit"
+            type="button"
             color="orange-darken-4 mt-8"
             rounded="0"
             append-icon="mdi-file-document-edit"
             :loading="loading"
+            @click="handleNewEmail(true)"
           >
             Save as draft
           </v-btn>
@@ -227,7 +229,7 @@ export default {
     closeMenu() {
       this.newEmailForm.open = false
     },
-    async handleNewEmail(draft) {
+    async handleNewEmail(draft = false) {
       const { valid } = await this.$refs.form.validate()
 
       if (!valid) return
@@ -249,11 +251,25 @@ export default {
       this.loading = true
 
       try {
-        await api.post(url, body, {
+        const emailCreation = await api.post(url, body, {
           headers: {
             Authorization: `Bearer ${this.auth.token}`
           }
         })
+
+        if (emailCreation.status === 201 && !draft && this.formFields.attachments.length > 0) {
+          const formData = new FormData()
+
+          this.formFields.attachments.forEach(attachment => {
+            formData.append('attachments', attachment)
+          })
+
+          await api.post(`/attachment/insert/email/${emailCreation.data.id}`, formData, {
+            headers: {
+              Authorization: `Bearer ${this.auth.token}`
+            }
+          })
+        }
 
         this.toast.success(`New e-mail created${draft ? ' as draft' : ''} successfully!`);
       } catch(err) {
