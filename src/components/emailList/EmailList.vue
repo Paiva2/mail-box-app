@@ -10,7 +10,7 @@
     </template>
 
     <v-list lines="two" class="list-items pt-0">
-      <v-list-item :disabled="loadingEmailList" v-for="(email, index) in emails" :key="email.id" class="pa-0">
+      <v-list-item :disabled="loadingEmailList" v-for="(email, index) in emailList" :key="email.id" class="pa-0">
         <v-btn
           selected-class="selected"
           v-ripple="{ class: `text-info` }"
@@ -33,7 +33,7 @@
           </div>
         </v-btn>
 
-        <v-divider v-if="index < emails.length - 1"></v-divider>
+        <v-divider v-if="index < emailList.length - 1"></v-divider>
       </v-list-item>
     </v-list>
   </v-card>
@@ -41,14 +41,13 @@
 
 <script>
 import { mapState } from 'vuex'
-import api from '@/lib/axios'
 import { MutationTypes } from '@/lib/vuex/types/mutation-types'
+import api from '@/lib/axios'
 
 export default {
   name: 'EmailList',
   data() {
     return {
-      emails: [],
       request: {
         page: 1,
         perPage: 15,
@@ -60,7 +59,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['auth', 'loadingEmailList', 'selectedEmailId']),
+    ...mapState(['auth', 'loadingEmailList', 'selectedEmailId', 'emailList']),
   },
   async mounted() {
     await this.getInboxMails()
@@ -82,7 +81,7 @@ export default {
           totalPages: inboxMails.data.totalPages
         }
 
-        this.emails = inboxMails.data.emails
+        this.$store.commit(MutationTypes.EMAIL.SET_LIST, inboxMails.data.emails)
       } catch (e) {
         console.error('Error while fetching Inbox e-mails...')
       }

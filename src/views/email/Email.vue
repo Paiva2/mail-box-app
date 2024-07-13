@@ -42,6 +42,11 @@
                   {{ receiving }}
                 </template>
               </span>
+
+              <span class="text-body-2 text-grey-darken-1 font-weight-regular to-list">
+                <span class="text-grey-darken-1">Send at: </span>
+                  {{ formatDate(email.createdAt) }}
+              </span>
             </div>
           </div>
 
@@ -169,6 +174,9 @@ export default {
       })
 
       return fixListToGetMe
+    },
+    formatDate(date) {
+      return new Intl.DateTimeFormat('en-US').format(new Date(date))
     }
   }
 }

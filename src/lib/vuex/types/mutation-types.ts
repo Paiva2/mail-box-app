@@ -9,6 +9,10 @@ export const MutationTypes = {
   SET_STOMP_CLIENT: 'SET_STOMP_CLIENT',
   SET_LOADING_EMAIL_LIST: 'SET_LOADING_EMAIL_LIST',
   EMAIL: {
-    SELECTED_ID: 'SELECTED_ID'
+    SELECTED_ID: 'SELECTED_ID',
+    SET_LIST: 'SET_LIST',
+    LIST: {
+      INSERT: 'INSERT'
+    }
   }
 }

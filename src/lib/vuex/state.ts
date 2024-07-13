@@ -17,6 +17,8 @@ export const state = {
   stompClient: null as null | CompatClient,
   loadingEmailList: false,
   selectedEmailId: '',
+  //todo: fix type
+  emailList: [] as any[]
 }
 
 export type State = typeof state

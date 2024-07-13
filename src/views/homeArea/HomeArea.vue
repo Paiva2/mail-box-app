@@ -12,11 +12,17 @@ import SockJs from "sockjs-client/dist/sockjs"
 import { ActionTypes } from '@/lib/vuex/types/action-types'
 import { MutationTypes } from '@/lib/vuex/types/mutation-types'
 import { mapState, mapGetters } from 'vuex'
+import { useToast } from "vue-toastification";
 
 export default {
   name: 'HomeArea',
+  setup() {
+    const toast = useToast();
+
+    return { toast };
+  },
   computed: {
-  ...mapState(['profile', 'auth', 'stompClient']),
+  ...mapState(['profile', 'auth', 'stompClient', 'emailList']),
   ...mapGetters(['isUserAuth'])
   },
   async created() {
@@ -36,6 +42,8 @@ export default {
           messageType: 'NEW_CONNECTION_INBOX'
         }),
       }, this.subscribeToConnection, this.connectionError)
+
+      this.stompClient.debug = () => {};
     },
     connectionError() {
       console.error('Error while connecting on WS...')
@@ -43,23 +51,17 @@ export default {
     subscribeToConnection () {
       this.stompClient.subscribe(`/queue/inbox/${this.profile.email}`, this.emailReceived)
     },
-    triggerNewEmail() {
-      console.log('Sending a new e-mail...')
-
-      this.stompClient.send('/app/inbox', {} ,JSON.stringify({
-        emailPayload: {
-          openingOrders: false,
-          copyList: [],
-          message: 'lorem ipsum  lorem ipsum  lorem ipsum  lorem ipsum  lorem ipsum  lorem ipsum  lorem ipsum  lorem ipsum  lorem ipsum',
-          subject: 'Novo e-mail',
-          toEmails: ['paiva4@email.com']
-        },
-        messageType: 'NEW_EMAIL_INBOX'
-      }))
-    },
     emailReceived(payload) {
-      console.log("E-mail recebido")
-      console.log(payload)
+      this.toast.warning(`New e-mail received!`);
+      const parseNewEmail = JSON.parse(payload.body)
+
+      this.$store.commit(MutationTypes.EMAIL.LIST.INSERT, {
+        id: parseNewEmail.id,
+        emailOwnerPicture: parseNewEmail.fromProfilePicture,
+        subject: parseNewEmail.title,
+        emailOwnerName: parseNewEmail.fromName,
+        message: parseNewEmail.message,
+      })
     },
     async setProfile() {
       await this.$store.dispatch(ActionTypes.SET_PROFILE)

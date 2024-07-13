@@ -186,7 +186,7 @@ export default {
     return { toast };
   },
   computed: {
-    ...mapState(['auth']),
+    ...mapState(['auth', 'stompClient']),
     orderSwitchVisibility() {
       return this.formFields.copiesList < 1 ? 'show' : ''
     },
@@ -244,11 +244,13 @@ export default {
         toEmails: this.formFields.toList,
         subject: this.formFields.title,
         message: this.formFields.message,
-        openingOrders: this.formFields.openingOrder,
+        openingOrders: this.formFields.openingOrder ?? false,
         copyList: this.formFields.copiesList
       }
 
       this.loading = true
+
+      let attachments = []
 
       try {
         const emailCreation = await api.post(url, body, {
@@ -264,20 +266,58 @@ export default {
             formData.append('attachments', attachment)
           })
 
-          await api.post(`/attachment/insert/email/${emailCreation.data.id}`, formData, {
-            headers: {
-              Authorization: `Bearer ${this.auth.token}`
-            }
-          })
+          const { data } = await this.insertAttachmentOnEmail(formData, emailCreation.data.id)
+
+          attachments = data
+        }
+
+        if (!draft) {
+          this.stompClient.send('/app/inbox', {}, JSON.stringify({
+            emailPayload: {
+              id: emailCreation.data.id,
+              hasOrder: emailCreation.data.hasOrder,
+              opened: false,
+              message: emailCreation.data.message,
+              title: emailCreation.data.subject,
+              createdAt: emailCreation.data.createdAt,
+              from: emailCreation.data.sendFrom,
+              fromName: emailCreation.data.sendFromName,
+              usersReceiving: this.formFields.toList,
+              copies: this.formFields.copiesList,
+              fromProfilePicture: emailCreation.data.sendFromProfilePicture,
+              attachments
+            },
+            messageType: 'NEW_EMAIL_INBOX'
+          }))
         }
 
         this.toast.success(`New e-mail created${draft ? ' as draft' : ''} successfully!`);
       } catch(err) {
+        console.error(err)
         console.log("Error while creating a new e-mail...")
         this.toast.error('Error while creating a new e-mail. Try again.');
       } finally {
         this.loading = false
-        await this.$refs.form.reset()
+        this.resetFieldsStates()
+      }
+    },
+    async insertAttachmentOnEmail(formData, emailId) {
+      await api.post(`/attachment/insert/email/${emailId}`, formData, {
+        headers: {
+          Authorization: `Bearer ${this.auth.token}`
+        }
+      })
+    },
+    async resetFieldsStates() {
+      await this.$refs.form.reset()
+
+      this.formFields = {
+        title: '',
+        message: '',
+        toList: [],
+        copiesList: [],
+        attachments: [],
+        openingOrder: false,
       }
     },
     emailToTest(value) {

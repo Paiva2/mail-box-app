@@ -44,5 +44,11 @@ export const mutations: MutationTree<State> = {
   },
   [MutationTypes.EMAIL.SELECTED_ID](state, payload) {
     state.selectedEmailId = payload
+  },
+  [MutationTypes.EMAIL.SET_LIST](state, payload) {
+    state.emailList = payload
+  },
+  [MutationTypes.EMAIL.LIST.INSERT](state, payload) {
+    state.emailList = [payload, ...state.emailList]
   }
 }
