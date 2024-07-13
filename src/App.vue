@@ -2,8 +2,6 @@
   <v-app>
     <v-main class="main d-flex">
       <side-bar v-if="isUserAuth" />
-      <email-action-bar v-if="isUserAuth" />
-
       <router-view />
     </v-main>
   </v-app>
@@ -14,7 +12,6 @@ import { RouterView } from 'vue-router';
 import { MutationTypes } from '@/lib/vuex/types/mutation-types'
 import { mapGetters, mapState } from 'vuex'
 import { ActionTypes } from '@/lib/vuex/types/action-types'
-import EmailActionBar from '@/components/emailActionBar/EmailActonBar'
 import SideBar from '@/components/sideBar/SideBar'
 import Stomp from 'stompjs'
 import SockJs from "sockjs-client/dist/sockjs"
@@ -23,7 +20,6 @@ import { useToast } from "vue-toastification";
 export default {
   name: 'App',
   components: {
-    EmailActionBar,
     SideBar,
     RouterView,
   },

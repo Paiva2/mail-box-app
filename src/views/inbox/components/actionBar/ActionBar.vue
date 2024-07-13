@@ -9,11 +9,11 @@
           New e-mail
         </v-btn>
 
-        <v-btn :disabled="disableButtons" tile>
+        <v-btn @click="markAsSpam" :disabled="disableButtons" tile>
           <v-icon color="yellow-darken-4" class="mr-1">
-            mdi-archive
+            mdi-alert-circle
           </v-icon>
-          Archive
+          Mark spam
         </v-btn>
 
         <v-btn :disabled="disableButtons" @click="deleteEmail" tile>
@@ -62,7 +62,7 @@ import { MutationTypes } from '@/lib/vuex/types/mutation-types'
 import { ActionTypes } from '@/lib/vuex/types/action-types'
 
 export default {
-  name: 'EmailActionBar',
+  name: 'ActionBar',
   setup() {
     const toast = useToast();
 
@@ -115,13 +115,7 @@ export default {
           }
         })
 
-        const inboxMails = await this.$store.dispatch(ActionTypes.GET_LIST.INBOX, {
-          page: 1,
-          perPage: 15,
-          flag: 'inbox',
-        })
-
-        this.$store.commit(MutationTypes.EMAIL.SET_LIST, inboxMails.emails)
+        await this.refetchEmailList()
 
         this.toast.success('Deleted successfully!')
         this.$router.push({ name: 'noEmailSelected' })
@@ -131,6 +125,38 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    async markAsSpam() {
+      const emailId = this.$route.params.emailId
+
+      this.loading = true
+
+      try {
+        await api.patch(`/email/spam/${emailId}?setSpam=true`, {} ,{
+          headers: {
+            Authorization: `Bearer ${this.auth.token}`
+          }
+        })
+
+        await this.refetchEmailList()
+
+        this.toast.success('E-mail sent to spam!')
+        this.$router.push({ name: 'noEmailSelected' })
+      } catch {
+        console.error("Error while marking e-mail as spam... Try again.")
+        this.toast.error('Error while marking e-mail as spam... Try again!')
+      } finally {
+        this.loading = false
+      }
+    },
+    async refetchEmailList() {
+      const inboxMails = await this.$store.dispatch(ActionTypes.GET_LIST.INBOX, {
+        page: 1,
+        perPage: 15,
+        flag: 'inbox',
+      })
+
+      this.$store.commit(MutationTypes.EMAIL.SET_LIST, inboxMails.emails)
     }
   }
 }
