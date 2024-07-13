@@ -239,8 +239,6 @@ export default {
         console.error(e)
 
         if(e instanceof AxiosError) {
-          console.error(e)
-
           if (e.response.status === 409) {
             return this.toast.error('E-mail already being used!');
           }

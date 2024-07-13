@@ -1,94 +1,99 @@
 <template>
-  <div class="email-view-wrapper d-flex pa-2">
-    <div class="email-title py-1">
-      <h4 class="text-h6">
-        {{ email.title }}
-      </h4>
-    </div>
+  <loading text="Loading e-mail..." v-if="loading" />
+    <div class="email-view-wrapper d-flex pa-2" v-else>
+      <div class="email-title py-1">
+        <h4 class="text-h6">
+          {{ email.title }}
+        </h4>
+      </div>
 
-    <div class="email-view elevation-1">
-      <div class="email-info-bar d-flex">
+      <div class="email-view elevation-1">
+        <div class="email-info-bar d-flex">
 
-        <div class="top-container d-flex pa-3">
-          <div class="d-flex align-center">
-            <div class="px-3">
-              <v-avatar
-                image="https://media.gq.com/photos/5601c28ef0075b5033a11aab/master/w_1600%2Cc_limit/paul-mccartney-gq-2015-sip-01.jpg"
-                color="surface-variant"
-              />
-              <v-tooltip
-                activator="parent"
-                location="end"
-                offset="-10"
-              >
-                {{ email.fromName }}
-              </v-tooltip>
+          <div class="top-container d-flex pa-3">
+            <div class="d-flex align-center">
+              <div class="px-3">
+                <v-avatar
+                  image="https://media.gq.com/photos/5601c28ef0075b5033a11aab/master/w_1600%2Cc_limit/paul-mccartney-gq-2015-sip-01.jpg"
+                  color="surface-variant"
+                />
+                <v-tooltip
+                  activator="parent"
+                  location="end"
+                  offset="-10"
+                >
+                  {{ email.fromName }}
+                </v-tooltip>
+              </div>
+              <div class="d-flex from-to-infos">
+                <span class="text-body-1 text-grey-darken-1 font-weight-medium">
+                  {{ email.from }}
+                </span>
+                <span class="text-body-2 text-grey-darken-1 font-weight-regular to-list">
+                  <span class="text-grey-darken-1">To: </span>
+
+                  <template v-for="(receiving) in email.usersReceiving?.join(', ')" :key="receiving">
+                    {{ receiving }}
+                  </template>
+                </span>
+
+                <span v-if="!!email.copies?.length" class="text-body-2 text-grey-darken-1 font-weight-regular to-list">
+                  <span class="text-grey-darken-1">Copies: </span>
+                  <template v-for="(receiving) in email.copies.join(', ')" :key="receiving">
+                    {{ receiving }}
+                  </template>
+                </span>
+
+                <span class="text-body-2 text-grey-darken-1 font-weight-regular to-list">
+                  <span class="text-grey-darken-1">Send at: </span>
+                    {{ formatDate(email.createdAt) }}
+                </span>
+              </div>
             </div>
-            <div class="d-flex from-to-infos">
-              <span class="text-body-1 text-grey-darken-1 font-weight-medium">
-                {{ email.from }}
-              </span>
-              <span class="text-body-2 text-grey-darken-1 font-weight-regular to-list">
-                <span class="text-grey-darken-1">To: </span>
 
-                <template v-for="(receiving) in email.usersReceiving?.join(', ')" :key="receiving">
-                  {{ receiving }}
-                </template>
-              </span>
-
-              <span v-if="!!email.copies?.length" class="text-body-2 text-grey-darken-1 font-weight-regular to-list">
-                <span class="text-grey-darken-1">Copies: </span>
-                <template v-for="(receiving) in email.copies.join(', ')" :key="receiving">
-                  {{ receiving }}
-                </template>
-              </span>
-
-              <span class="text-body-2 text-grey-darken-1 font-weight-regular to-list">
-                <span class="text-grey-darken-1">Send at: </span>
-                  {{ formatDate(email.createdAt) }}
-              </span>
-            </div>
+            <v-menu v-if="!!email.attachments?.length">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  color="blue-darken-1"
+                  v-bind="props"
+                  icon="mdi-paperclip"
+                  size="35"
+                  variant="outlined"
+                />
+              </template>
+              <v-list>
+                <v-list-item
+                  v-for="(attachment) in email.attachments"
+                  :key="attachment.id"
+                  :value="attachment.url"
+                >
+                  <v-list-item-title>{{ attachment.fileName }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
           </div>
+          <v-divider inset />
 
-          <v-menu v-if="!!email.attachments?.length">
-            <template v-slot:activator="{ props }">
-              <v-btn
-                color="blue-darken-1"
-                v-bind="props"
-                icon="mdi-paperclip"
-                size="35"
-                variant="outlined"
-              />
-            </template>
-            <v-list>
-              <v-list-item
-                v-for="(attachment) in email.attachments"
-                :key="attachment.id"
-                :value="attachment.url"
-              >
-                <v-list-item-title>{{ attachment.fileName }}</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </div>
-        <v-divider inset />
-
-        <div class="message-box pa-5 pt-2">
-          <p class="email-msg">
-            {{ email.message }}
-          </p>
+          <div class="message-box pa-5 pt-2">
+            <p class="email-msg">
+              {{ email.message }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
 import api from '@/lib/axios'
 import { mapState } from 'vuex'
 import { MutationTypes } from '@/lib/vuex/types/mutation-types'
+import Loading from './components/loading/Loading'
 
 export default {
+  components: {
+    Loading
+  },
   data() {
     return {
       email: {
@@ -109,6 +114,7 @@ export default {
         { title: 'img.jpg' },
         { title: 'file.pdf' },
       ],
+      loading: false
     }
   },
   computed: {
@@ -129,6 +135,7 @@ export default {
   methods: {
     async fetchEmail(id) {
       this.$store.commit(MutationTypes.SET_LOADING_EMAIL_LIST, true)
+      this.loading = true
 
       try {
         const email = await api.get(`/email/me/${id}`, {
@@ -155,6 +162,7 @@ export default {
         console.log("Error while fetching e-mail...")
       } finally {
         this.$store.commit(MutationTypes.SET_LOADING_EMAIL_LIST, false)
+        this.loading = false
       }
     },
     formatReceivingList(list) {

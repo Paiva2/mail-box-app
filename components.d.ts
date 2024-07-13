@@ -12,6 +12,7 @@ declare module 'vue' {
     EmailList: typeof import('./src/components/emailList/EmailList.vue')['default']
     EmailPreview: typeof import('./src/components/emailPreview/EmailPreview.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    Loading: typeof import('./src/components/loading/Loading.vue')['default']
     NewEmail: typeof import('./src/components/newEmail/NewEmail.vue')['default']
     ProfileMenu: typeof import('./src/components/profileMenu/ProfileMenu.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

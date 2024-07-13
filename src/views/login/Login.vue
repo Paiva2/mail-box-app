@@ -70,8 +70,6 @@ import api from "../../lib/axios"
 import { useToast } from "vue-toastification";
 import Cookies from 'js-cookie'
 import { mapState } from 'vuex'
-import { MutationTypes } from '@/lib/vuex/types/mutation-types'
-import { ActionTypes } from '@/lib/vuex/types/action-types'
 
 export default {
   name: 'Login',
@@ -149,7 +147,7 @@ export default {
       Cookies.set('mail-box-auth', authToken, { path: '/', expires: 7 })
     },
     redirectToHome() {
-      this.$router.push({ name: 'home' })
+      this.$router.push({ name: 'inbox' })
     }
   },
 }

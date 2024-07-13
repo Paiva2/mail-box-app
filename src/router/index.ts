@@ -4,20 +4,28 @@ import { MutationTypes } from "../lib/vuex/types/mutation-types"
 import Login from '@/views/login/Login.vue'
 import Email from "@/views/email/Email.vue"
 import Register from "@/views/register/Register.vue"
-import HomeArea from "@/views/homeArea/HomeArea.vue"
+import Inbox from "../views/inbox/Inbox.vue"
+import NoEmailSelected from "../views/noEmailSelected/NoEmailSelected.vue"
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: HomeArea,
-    },
-    {
-      path: '/mail/:emailId',
-      name: 'email',
-      component: Email,
+      path: '/inbox',
+      name: 'inbox',
+      component: Inbox,
+      children: [
+        {
+          path: '',
+          name: 'noSelected',
+          component: NoEmailSelected,
+        },
+        {
+          path: ':emailId',
+          name: 'email',
+          component: Email,
+        },
+      ]
     },
     {
       path: '/login',
@@ -28,6 +36,10 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: Register,
+    },
+    {
+      path: '/:catchAll(.*)',
+      redirect:'/inbox'
     },
   ]
 })
