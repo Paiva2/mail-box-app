@@ -1,8 +1,8 @@
 <template>
-  <action-bar />
+  <action-bar :filters="filters" @update:pagination="updatePagination" />
 
   <div class="d-flex">
-    <email-list />
+    <email-list :filters="filters" :request="request" @update:pagination="updatePagination" />
     <router-view />
   </div>
 </template>
@@ -17,6 +17,28 @@ export default {
   components: {
     EmailList,
     ActionBar
+  },
+  data() {
+    return {
+      filters: {
+        searchValue: '',
+      },
+      request: {
+        page: 1,
+        perPage: 15,
+        totalElements: 0,
+        searchFor: '',
+        totalPages: 1,
+      },
+    }
+  },
+  methods: {
+    updatePagination(payload) {
+      this.request = {
+        ...this.request,
+        ...payload
+      }
+    }
   }
 }
 </script>

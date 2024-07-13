@@ -33,7 +33,7 @@
           class="text-body-2 search-input"
           :class="searchVisible"
           single-line
-          v-model="searchValue"
+          v-model="filters.searchValue"
         >
           <template v-slot:label>
             <span class="text-body-2">Search e-mails</span>
@@ -71,6 +71,12 @@ export default {
   components: {
     NewEmail
   },
+  props: {
+    filters: {
+      type: Object,
+      required: true
+    }
+  },
   computed: {
     ...mapState(['auth']),
     searchVisible() {
@@ -86,7 +92,7 @@ export default {
         open: false
       },
       openSearch: false,
-      searchValue: '',
+      searching: false,
       loading: false
     }
   },
@@ -94,14 +100,22 @@ export default {
     openNewEmailForm() {
       this.newEmailForm.open = true
     },
-    handleSearch() {
+    async handleSearch() {
       if (!this.openSearch) {
         this.openSearch = true
         return
-      } else if (!this.searchValue) {
+      } else if (!this.filters.searchValue) {
         this.openSearch = false
+
+        if (this.searching) {
+          this.searching = false
+          await this.refetchEmailList(this.filters.searchValue)
+        }
         return
       }
+
+      await this.refetchEmailList(this.filters.searchValue)
+      this.searching = true
     },
     async deleteEmail() {
       const emailId = this.$route.params.emailId
@@ -149,14 +163,28 @@ export default {
         this.loading = false
       }
     },
-    async refetchEmailList() {
-      const inboxMails = await this.$store.dispatch(ActionTypes.GET_LIST.INBOX, {
+    async refetchEmailList(keyword = null) {
+      const params = {
         page: 1,
         perPage: 15,
         flag: 'inbox',
-      })
+      }
+
+      if (keyword !== null) {
+        params.keyword = keyword
+      }
+
+      const inboxMails = await this.$store.dispatch(ActionTypes.GET_LIST.INBOX, params)
 
       this.$store.commit(MutationTypes.EMAIL.SET_LIST, inboxMails.emails)
+
+      this.$emit('update:pagination', {
+        ...this.request,
+        page: inboxMails.page,
+        perPage: inboxMails.size,
+        totalElements: inboxMails.totalItems,
+        totalPages: inboxMails.totalPages
+      })
     }
   }
 }

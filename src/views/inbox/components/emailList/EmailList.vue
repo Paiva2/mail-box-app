@@ -79,15 +79,18 @@ export default {
   components: {
     GenericLoading
   },
+  props: {
+    filters: {
+      type: Object,
+      required: true
+    },
+    request: {
+      type: Object,
+      required: true
+    }
+  },
   data() {
     return {
-      request: {
-        page: 1,
-        perPage: 15,
-        totalElements: 0,
-        searchFor: '',
-        totalPages: 1,
-      },
       selectedEmail: null,
       loading: false
     }
@@ -113,15 +116,16 @@ export default {
           page: page,
           perPage: perPage,
           flag: 'inbox',
+          keyword: this.filters.searchValue
         })
 
-        this.request = {
+        this.$emit('update:pagination', {
           ...this.request,
           page: inboxMails.page,
           perPage: inboxMails.size,
           totalElements: inboxMails.totalItems,
           totalPages: inboxMails.totalPages
-        }
+        })
 
         let currentEmails = []
 

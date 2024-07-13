@@ -27,8 +27,14 @@ export const actions = {
       }
     }
   },
-  async [ActionTypes.GET_LIST.INBOX]({ commit, state }: ActionDefault, payload: { page: number, perPage: number, flag: string }) {
-    const { data } = await api.get(`/email/inbox?page=${payload.page}&size=${payload.perPage}&flag=${payload.flag}&spam=false`, {
+  async [ActionTypes.GET_LIST.INBOX]({ commit, state }: ActionDefault, payload: { page: number, perPage: number, flag: string, keyword: string | null }) {
+    let url = `/email/inbox?page=${payload.page}&size=${payload.perPage}&flag=${payload.flag}&spam=false`
+
+    if (payload.keyword != null && !!payload.keyword.length) {
+      url += `&keyword=${payload.keyword}`
+    }
+
+    const { data } = await api.get(url, {
       headers: {
         Authorization: `Bearer ${state.auth.token}`
       }
