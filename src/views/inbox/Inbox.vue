@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import EmailList from '@/components/emailList/EmailList'
+import EmailList from './components/emailList/EmailList'
 import { RouterView } from 'vue-router';
 
 export default {

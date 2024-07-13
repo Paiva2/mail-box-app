@@ -27,4 +27,13 @@ export const actions = {
       }
     }
   },
+  async [ActionTypes.GET_LIST.INBOX]({ commit, state }: ActionDefault, payload: { page: number, perPage: number, flag: string }) {
+    const { data } = await api.get(`/email/inbox?page=${payload.page}&size=${payload.perPage}&flag=${payload.flag}`, {
+      headers: {
+        Authorization: `Bearer ${state.auth.token}`
+      }
+    })
+
+    return data
+  }
 }

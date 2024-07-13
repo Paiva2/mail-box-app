@@ -34,7 +34,7 @@ export default {
   },
   computed: {
     ...mapGetters(['isUserAuth']),
-    ...mapState(['profile', 'auth', 'stompClient', 'emailList']),
+    ...mapState(['profile', 'auth', 'stompClient']),
   },
   async created() {
     await this.fillAuthToken()
@@ -103,40 +103,5 @@ export default {
 
   .main {
     flex-direction: column;
-  }
-
-  .mail-inbox-wrapper {
-    justify-content: start;
-    width: 100%;
-    flex-direction: column
-  }
-
-  .mail-list-wrapper {
-    height: calc(100vh - 44px);
-    overflow-y: auto;
-    min-width: 27.1875rem;
-  }
-
-  .mail-button > * {
-    max-width: 100%;
-  }
-
-  .mail-button {
-    text-transform: none;
-    letter-spacing: normal;
-  }
-
-  .mail-button.selected {
-    background-color: #BBDEFB
-  }
-
-  .btn-content-wrapper {
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  .btn-content-texts {
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 </style>

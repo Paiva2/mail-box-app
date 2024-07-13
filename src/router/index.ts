@@ -17,7 +17,7 @@ const router = createRouter({
       children: [
         {
           path: '',
-          name: 'noSelected',
+          name: 'noEmailSelected',
           component: NoEmailSelected,
         },
         {

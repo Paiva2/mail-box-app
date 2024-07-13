@@ -1,3 +1,6 @@
-export enum ActionTypes {
-  SET_PROFILE = 'SET_PROFILE'
+export const ActionTypes = {
+  SET_PROFILE: 'SET_PROFILE',
+  GET_LIST: {
+    INBOX: 'INBOX'
+  }
 }

@@ -253,8 +253,9 @@ export default {
       this.$emit('close-menu')
     },
     logout() {
+      this.$router.push({name: 'login'})
       this.$store.commit(MutationTypes.LOGIN.SET_LOGOUT)
-      this.$router.push({ name: 'login' })
+      window.location.reload()
     },
     fillDefaultValues() {
       this.formFields = {

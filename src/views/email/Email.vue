@@ -231,4 +231,9 @@ export default {
     font-size: 15px;
     line-height: 1.25rem;
   }
+
+  .message-box {
+    word-break: break-word;
+    word-wrap: break-word;
+  }
 </style>

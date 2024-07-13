@@ -147,7 +147,7 @@ export default {
       Cookies.set('mail-box-auth', authToken, { path: '/', expires: 7 })
     },
     redirectToHome() {
-      this.$router.push({ name: 'inbox' })
+      this.$router.push({ name: 'noEmailSelected' })
     }
   },
 }

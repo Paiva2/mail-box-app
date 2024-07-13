@@ -221,7 +221,8 @@ export default {
         files => !files.some(file => file.size > 5000000) || 'File cannot have more than 5MB!'
       ],
       messageRules: [
-        value => !!value || `Message can't be empty`
+        value => !!value || `Message can't be empty`,
+        value => value.length <= 1000 || 'Max 1000 characters'
       ]
     }
   },
