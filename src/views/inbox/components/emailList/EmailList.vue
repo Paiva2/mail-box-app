@@ -155,7 +155,7 @@ export default {
 </script>
 
 <style scoped>
-  .mail-button >>> .v-btn__content {
+  .mail-button:deep(.v-btn__content) {
     min-width: 100%;
     justify-content: start;
   }

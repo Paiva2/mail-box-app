@@ -293,17 +293,17 @@ export default {
         }
 
         this.toast.success(`New e-mail created${draft ? ' as draft' : ''} successfully!`);
+        this.resetFieldsStates()
       } catch(err) {
         console.error(err)
         console.log("Error while creating a new e-mail...")
-        this.toast.error('Error while creating a new e-mail. Try again.');
+        this.toast.error(err.response.data.message);
       } finally {
         this.loading = false
-        this.resetFieldsStates()
       }
     },
     async insertAttachmentOnEmail(formData, emailId) {
-      await api.post(`/attachment/insert/email/${emailId}`, formData, {
+      return await api.post(`/attachment/insert/email/${emailId}`, formData, {
         headers: {
           Authorization: `Bearer ${this.auth.token}`
         }

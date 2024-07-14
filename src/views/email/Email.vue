@@ -1,5 +1,6 @@
 <template>
   <loading text="Loading e-mail..." v-if="loading" />
+
     <div class="email-view-wrapper d-flex pa-2" v-else>
       <div class="email-title py-1">
         <h4 class="text-h6">
@@ -51,27 +52,9 @@
               </div>
             </div>
 
-            <v-menu v-if="!!email.attachments?.length">
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  color="blue-darken-1"
-                  v-bind="props"
-                  icon="mdi-paperclip"
-                  size="35"
-                  variant="outlined"
-                />
-              </template>
-              <v-list>
-                <v-list-item
-                  v-for="(attachment) in email.attachments"
-                  :key="attachment.id"
-                  :value="attachment.url"
-                >
-                  <v-list-item-title>{{ attachment.fileName }}</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
+            <attachments-menu v-if="!!email.attachments?.length" :attachments="email.attachments" />
           </div>
+
           <v-divider inset />
 
           <div class="message-box pa-5 pt-2">
@@ -88,11 +71,14 @@
 import api from '@/lib/axios'
 import { mapState } from 'vuex'
 import { MutationTypes } from '@/lib/vuex/types/mutation-types'
+import AttachmentsMenu from './components/attachmentsMenu/AttachmentsMenu'
 import Loading from './components/loading/Loading'
+import fileIcons from '@/constants/mapFileIcon'
 
 export default {
   components: {
-    Loading
+    Loading,
+    AttachmentsMenu
   },
   data() {
     return {
@@ -110,10 +96,6 @@ export default {
         attachments: [],
         isSpam: null,
       },
-      items: [
-        { title: 'img.jpg' },
-        { title: 'file.pdf' },
-      ],
       loading: false
     }
   },
@@ -185,7 +167,7 @@ export default {
     },
     formatDate(date) {
       return new Intl.DateTimeFormat('en-US').format(new Date(date))
-    }
+    },
   }
 }
 </script>
