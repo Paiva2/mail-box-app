@@ -1,10 +1,10 @@
-import { CompatClient } from "@stomp/stompjs"
+import { IState } from "./types/states"
 
-export const state = {
+export const state: IState = {
   auth: {
     token: null,
     subject: null,
-  } as { token: string | null, subject: number | null },
+  },
   profile: {
     id: null,
     email: null,
@@ -14,11 +14,10 @@ export const state = {
     role: null,
     createdAt: null
   },
-  stompClient: null as null | CompatClient,
+  stompClient: null,
   loadingEmailList: false,
-  selectedEmailId: '',
-  //todo: fix type
-  emailList: [] as any[]
+  selectedEmailId: null,
+  emailList: []
 }
 
 export type State = typeof state

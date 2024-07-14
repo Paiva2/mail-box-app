@@ -49,15 +49,17 @@ router.beforeEach((to, _, next) => {
 
   store.commit(MutationTypes.LOGIN.SET_AUTH)
 
-  if (publicRoutes.includes(to.name) && store.getters.isUserAuth) {
+  const isPublicRoute = publicRoutes.includes(to.name)
+
+  if (isPublicRoute && store.getters.isUserAuth) {
     return next({ name: 'home' })
   }
 
-  if (!publicRoutes.includes(to.name) && (!store.getters.isUserAuth || !store.getters.userId)) {
+  if (!isPublicRoute && (!store.getters.isUserAuth || !store.getters.userId)) {
     return next({ name: 'login' })
   }
 
-  if (publicRoutes.includes(to.name) && store.state.stompClient != null) {
+  if (isPublicRoute && store.state.stompClient != null) {
     store.state.stompClient.disconnect()
 
     store.commit(MutationTypes.SET_STOMP_CLIENT, null)
