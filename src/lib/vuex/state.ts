@@ -17,7 +17,7 @@ export const state: IState = {
   stompClient: null,
   loadingEmailList: false,
   selectedEmailId: null,
-  emailList: []
+  emailList: [],
 }
 
 export type State = typeof state

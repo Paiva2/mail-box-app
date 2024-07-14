@@ -6,6 +6,7 @@ import Email from "@/views/email/Email.vue"
 import Register from "@/views/register/Register.vue"
 import Inbox from "../views/inbox/Inbox.vue"
 import NoEmailSelected from "../views/noEmailSelected/NoEmailSelected.vue"
+import Spam from "../views/spam/Spam.vue"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -14,6 +15,9 @@ const router = createRouter({
       path: '/inbox',
       name: 'inbox',
       component: Inbox,
+      meta: {
+        fallBackName: 'noEmailSelected',
+      },
       children: [
         {
           path: '',
@@ -23,6 +27,26 @@ const router = createRouter({
         {
           path: ':emailId',
           name: 'email',
+          component: Email,
+        },
+      ]
+    },
+    {
+      path: '/spam',
+      name: 'spam',
+      component: Spam,
+      meta: {
+        fallBackName: 'noEmailSelectedSpam',
+      },
+      children: [
+        {
+          path: '',
+          name: 'noEmailSelectedSpam',
+          component: NoEmailSelected,
+        },
+        {
+          path: ':emailId',
+          name: 'emailSpam',
           component: Email,
         },
       ]

@@ -2,7 +2,7 @@
   <loading text="Loading e-mail..." v-if="loading" />
 
     <div class="email-view-wrapper d-flex pa-2" v-else>
-      <div class="email-title py-1">
+      <div class="email-title pa-1">
         <h4 class="text-h6">
           {{ email.title }}
         </h4>
@@ -47,12 +47,27 @@
 
                 <span class="text-body-2 text-grey-darken-1 font-weight-regular to-list">
                   <span class="text-grey-darken-1">Send at: </span>
-                    {{ formatDate(email.createdAt) }}
+                    {{ formatDate(email.createdAt) }}h
                 </span>
               </div>
             </div>
 
-            <attachments-menu v-if="!!email.attachments?.length" :attachments="email.attachments" />
+            <div class="d-flex align-center email-actions">
+              <v-tooltip text="Answer" location="top">
+                <template v-slot:activator="{ props }">
+                  <v-btn
+                    v-bind="props"
+                    flat
+                    icon="mdi-arrow-left-bottom"
+                    size="35"
+                    variant="outlined"
+                    color="light-green-darken-2"
+                    @click="handleAnswerForm"
+                  />
+                </template>
+              </v-tooltip>
+              <attachments-menu v-if="!!email.attachments?.length" :attachments="email.attachments" />
+            </div>
           </div>
 
           <v-divider inset />
@@ -64,6 +79,8 @@
           </div>
         </div>
       </div>
+
+      <answer-email :answerEmailForm="answerEmailForm" />
     </div>
 </template>
 
@@ -74,11 +91,13 @@ import { MutationTypes } from '@/lib/vuex/types/mutation-types'
 import AttachmentsMenu from './components/attachmentsMenu/AttachmentsMenu'
 import Loading from './components/loading/Loading'
 import fileIcons from '@/constants/mapFileIcon'
+import AnswerEmail from './components/AnswerEmail/AnswerEmail'
 
 export default {
   components: {
     Loading,
-    AttachmentsMenu
+    AttachmentsMenu,
+    AnswerEmail
   },
   data() {
     return {
@@ -96,7 +115,10 @@ export default {
         attachments: [],
         isSpam: null,
       },
-      loading: false
+      loading: false,
+      answerEmailForm: {
+        open: false
+      }
     }
   },
   computed: {
@@ -166,8 +188,17 @@ export default {
       return fixListToGetMe
     },
     formatDate(date) {
-      return new Intl.DateTimeFormat('en-US').format(new Date(date))
+      return new Date(date)?.toLocaleDateString('pt-BR', {
+        minute: "2-digit",
+        hour: "2-digit",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      })
     },
+    handleAnswerForm() {
+      this.answerEmailForm.open = true
+    }
   }
 }
 </script>
@@ -217,5 +248,9 @@ export default {
   .message-box {
     word-break: break-word;
     word-wrap: break-word;
+  }
+
+  .email-actions {
+    gap: .625rem
   }
 </style>

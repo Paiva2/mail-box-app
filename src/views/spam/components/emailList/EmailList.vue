@@ -6,7 +6,7 @@
     tile
   >
     <template v-slot:subtitle>
-      <h1 class="text-h6">Inbox</h1>
+      <h1 class="text-h6">Spam</h1>
     </template>
 
     <generic-loading v-if="loading" />
@@ -105,14 +105,14 @@ export default {
     }
   },
   async mounted() {
-    await this.getInboxMails(this.request.page, this.request.perPage)
+    await this.getSpamEmails(this.request.page, this.request.perPage)
   },
   methods: {
-    async getInboxMails(page, perPage) {
+    async getSpamEmails(page, perPage) {
       this.loading = true
 
       try {
-        const inboxMails = await this.$store.dispatch(ActionTypes.GET_LIST.INBOX, {
+        const spamMails = await this.$store.dispatch(ActionTypes.GET_LIST.SPAM, {
           page: page,
           perPage: perPage,
           flag: 'inbox',
@@ -121,33 +121,33 @@ export default {
 
         this.$emit('update:pagination', {
           ...this.request,
-          page: inboxMails.page,
-          perPage: inboxMails.size,
-          totalElements: inboxMails.totalItems,
-          totalPages: inboxMails.totalPages
+          page: spamMails.page,
+          perPage: spamMails.size,
+          totalElements: spamMails.totalItems,
+          totalPages: spamMails.totalPages
         })
 
         let currentEmails = []
 
         if (this.emailList.length > 0) {
-          currentEmails = this.emailList.concat(inboxMails.emails)
+          currentEmails = this.emailList.concat(spamMails.emails)
         } else {
-          currentEmails = inboxMails.emails
+          currentEmails = spamMails.emails
         }
 
         this.$store.commit(MutationTypes.EMAIL.SET_LIST, currentEmails)
       } catch (e) {
-        console.error('Error while fetching Inbox e-mails...')
+        console.error('Error while fetching spam e-mails...')
       } finally {
         this.loading = false
       }
     },
     selectEmailToPreview(emailId) {
       this.$store.commit(MutationTypes.EMAIL.SELECTED_ID, emailId)
-      this.$router.push({ name: 'email', params: { emailId: emailId }  })
+      this.$router.push({ name: 'emailSpam', params: { emailId: emailId }  })
     },
     async loadMore({done}) {
-        await this.getInboxMails(this.request.page + 1, this.request.perPage)
+        await this.getSpamEmails(this.request.page + 1, this.request.perPage)
         done()
     }
   }

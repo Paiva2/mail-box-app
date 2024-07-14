@@ -41,5 +41,20 @@ export const actions = {
     })
 
     return data
+  },
+  async [ActionTypes.GET_LIST.SPAM]({ commit, state }: ActionDefault, payload: { page: number, perPage: number, flag: string, keyword: string | null }) {
+    let url = `/email/inbox?page=${payload.page}&size=${payload.perPage}&flag=${payload.flag}&spam=true`
+
+    if (payload.keyword != null && !!payload.keyword.length) {
+      url += `&keyword=${payload.keyword}`
+    }
+
+    const { data } = await api.get(url, {
+      headers: {
+        Authorization: `Bearer ${state.auth.token}`
+      }
+    })
+
+    return data
   }
 }

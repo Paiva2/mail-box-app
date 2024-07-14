@@ -32,7 +32,7 @@
         :prepend-icon="item.icon"
         :title="item.name"
         :value="item.value"
-        @click="selectedMenu = item.value"
+        @click="goTo(item.value)"
         :active="selectedMenu === item.value"
       />
     </v-list>
@@ -70,20 +70,28 @@ import { mapState } from 'vuex'
     computed: {
       ...mapState(['profile']),
     },
+    created() {
+      this.$watch(
+        () => this.$router.currentRoute.value.meta.fallBackName,
+          (name) => {
+            this.selectedMenu = name
+          }
+      )
+    },
     data() {
       return {
         profileMenu: {
           open: false
         },
-        selectedMenu: 'inbox',
+        selectedMenu: 'noEmailSelected',
         menuItems: [
-          {name: 'Inbox', value: 'inbox', icon: 'mdi-inbox-arrow-down'},
+          {name: 'Inbox', value: 'noEmailSelected', icon: 'mdi-inbox-arrow-down'},
           {name: 'Sent Mail', value: 'sent', icon: 'mdi-send'},
-          {name: 'Spam', value: 'spam', icon: 'mdi-alert-circle'},
+          {name: 'Spam', value: 'noEmailSelectedSpam', icon: 'mdi-alert-circle'},
           {name: 'Folders', value: 'folders', icon: 'mdi-folder'},
           {name: 'Important', value: 'important', icon: 'mdi-flag'},
           {name: 'Favourite', value: 'favourite', icon: 'mdi-star'},
-          {name: 'Draft', value: 'Draft', icon: 'mdi-file-document-edit'},
+          {name: 'Draft', value: 'draft', icon: 'mdi-file-document-edit'},
           {name: 'Trash', value: 'trash', icon: 'mdi-delete'},
         ]
       }
@@ -92,6 +100,10 @@ import { mapState } from 'vuex'
       handleProfileMenu() {
         this.profileMenu.open = !this.profileMenu.open
       },
+      goTo(routeName) {
+        this.selectedMenu = routeName
+        this.$router.push({name: routeName})
+      }
     }
   }
 </script>
