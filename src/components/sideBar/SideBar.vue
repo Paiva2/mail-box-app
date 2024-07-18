@@ -86,7 +86,7 @@ import { mapState } from 'vuex'
         selectedMenu: 'noEmailSelected',
         menuItems: [
           {name: 'Inbox', value: 'noEmailSelected', icon: 'mdi-inbox-arrow-down'},
-          {name: 'Sent Mail', value: 'sent', icon: 'mdi-send'},
+          {name: 'Sent Mail', value: 'noEmailSelectedSent', icon: 'mdi-send'},
           {name: 'Spam', value: 'noEmailSelectedSpam', icon: 'mdi-alert-circle'},
           {name: 'Folders', value: 'folders', icon: 'mdi-folder'},
           {name: 'Important', value: 'important', icon: 'mdi-flag'},

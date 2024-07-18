@@ -1,7 +1,7 @@
 <template>
   <loading text="Loading e-mail..." v-if="loading" />
 
-    <div class="email-view-wrapper d-flex pa-2" v-else>
+    <div class="email-view-wrapper d-flex pa-2" v-else-if="!!email.id">
       <div class="email-title pa-1">
         <h4 class="text-h6">
           {{ email.title }}
@@ -15,7 +15,7 @@
             <div class="d-flex align-center">
               <div class="px-3">
                 <v-avatar
-                  image="https://media.gq.com/photos/5601c28ef0075b5033a11aab/master/w_1600%2Cc_limit/paul-mccartney-gq-2015-sip-01.jpg"
+                  :image="email.sendFromProfilePicture ?? profile.defaultProfilePicture"
                   color="surface-variant"
                 />
                 <v-tooltip
@@ -53,7 +53,7 @@
             </div>
 
             <div class="d-flex align-center email-actions">
-              <v-tooltip text="Answer" location="top">
+              <v-tooltip text="Answer" location="top" v-if="!isFilteringSent">
                 <template v-slot:activator="{ props }">
                   <v-btn
                     v-bind="props"
@@ -80,8 +80,17 @@
         </div>
       </div>
 
-      <answer-email :answerEmailForm="answerEmailForm" />
+      <answer-email v-if="!isFilteringSent" :answerEmailForm="answerEmailForm" />
     </div>
+
+    <v-empty-state
+      v-else
+      headline="Whoops, 404"
+      title="E-mail not found"
+      text="The e-mail you were looking for does not exist"
+      icon="mdi-email-off"
+      class="w-100"
+    />
 </template>
 
 <script>
@@ -123,6 +132,9 @@ export default {
   },
   computed: {
     ...mapState(['auth', 'profile']),
+    isFilteringSent() {
+      return this.$route.name === 'emailSent'
+    }
   },
   async created() {
     await this.fetchEmail(this.$route.params.emailId)
@@ -141,8 +153,16 @@ export default {
       this.$store.commit(MutationTypes.SET_LOADING_EMAIL_LIST, true)
       this.loading = true
 
+      let url = null
+
+      if (this.isFilteringSent) {
+        url = '/email/sent'
+      } else {
+        url = '/email/me'
+      }
+
       try {
-        const email = await api.get(`/email/me/${id}`, {
+        const email = await api.get(`${url}/${id}`, {
           headers: {
             Authorization: `Bearer ${this.auth.token}`
           }
@@ -151,18 +171,20 @@ export default {
         this.email = {
           id: email.data.id,
           hasOrder: email.data.hasOrder,
-          opened: email.data.opened,
+          opened: email.data.opened ?? null,
           message: email.data.message,
           title: email.data.subject,
           createdAt: email.data.createdAt,
-          from: email.data.sendFrom,
-          fromName: email.data.sendFromName,
-          usersReceiving: this.formatReceivingList(email.data.userReceivingEmailOutput),
-          isSpam: email.data.isSpam,
+          from: this.isFilteringSent ? 'Me' : email.data.sendFrom,
+          fromName: this.isFilteringSent ? 'Me' : email.data.sendFromName,
+          usersReceiving: this.formatReceivingList(email.data.usersReceivingEmailOutput),
+          isSpam: email.data.isSpam ?? null,
           attachments: email.data.attachments,
-          copies: this.formatReceivingList(email.data.ccs)
+          copies: this.formatReceivingList(email.data.ccs),
+          sendFromProfilePicture: this.isFilteringSent ? this.profile.profilePicture : email.data.sendFromProfilePicture
         }
-      } catch {
+      } catch (e){
+        console.error(e)
         console.log("Error while fetching e-mail...")
       } finally {
         this.$store.commit(MutationTypes.SET_LOADING_EMAIL_LIST, false)
@@ -197,6 +219,8 @@ export default {
       })
     },
     handleAnswerForm() {
+      if(this.isFilteringSent) return
+
       this.answerEmailForm.open = true
     }
   }

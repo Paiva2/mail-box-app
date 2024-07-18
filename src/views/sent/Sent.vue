@@ -14,7 +14,7 @@ import { MutationTypes } from '@/lib/vuex/types/mutation-types'
 import { RouterView } from 'vue-router';
 
 export default {
-  name: 'Spam',
+  name: 'Sent',
   components: {
     EmailList,
     ActionBar

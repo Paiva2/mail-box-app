@@ -2,13 +2,6 @@
   <v-app-bar :elevation="1" height="42">
     <div class="d-flex actions-wrapper">
       <div class="actions d-flex">
-        <v-btn @click="unmarkAsSpam" :disabled="disableButtons" tile>
-          <v-icon color="green-darken-4" class="mr-1">
-            mdi-alert-circle
-          </v-icon>
-          Unmark as spam
-        </v-btn>
-
         <v-btn :disabled="disableButtons" @click="deleteEmail" tile>
           <v-icon color="red-darken-2" class="mr-1">
             mdi-delete
@@ -113,33 +106,10 @@ export default {
         await this.refetchEmailList()
 
         this.toast.success('Deleted successfully!')
-        this.$router.push({ name: 'noEmailSelectedSpam' })
+        this.$router.push({ name: 'noEmailSelectedSent' })
       } catch {
         console.error("Error while deleting... Try again.")
         this.toast.error('Error while deleting... Try again!')
-      } finally {
-        this.loading = false
-      }
-    },
-    async unmarkAsSpam() {
-      const emailId = this.$route.params.emailId
-
-      this.loading = true
-
-      try {
-        await api.patch(`/email/spam/${emailId}?setSpam=false`, {} ,{
-          headers: {
-            Authorization: `Bearer ${this.auth.token}`
-          }
-        })
-
-        await this.refetchEmailList()
-
-        this.toast.success('E-mail removed from spam!')
-        this.$router.push({ name: 'noEmailSelectedSpam' })
-      } catch {
-        console.error("Error while unmarking e-mail as spam... Try again.")
-        this.toast.error('Error while unmarking e-mail as spam... Try again!')
       } finally {
         this.loading = false
       }
@@ -148,23 +118,22 @@ export default {
       const params = {
         page: 1,
         perPage: 15,
-        flag: 'inbox',
       }
 
       if (keyword !== null) {
         params.keyword = keyword
       }
 
-      const spamMailList = await this.$store.dispatch(ActionTypes.GET_LIST.SPAM, params)
+      const sentEmailList = await this.$store.dispatch(ActionTypes.GET_LIST.SENT, params)
 
-      this.$store.commit(MutationTypes.EMAIL.SET_LIST, spamMailList.emails)
+      this.$store.commit(MutationTypes.EMAIL.SET_LIST, sentEmailList.emails)
 
       this.$emit('update:pagination', {
         ...this.request,
-        page: spamMailList.page,
-        perPage: spamMailList.size,
-        totalElements: spamMailList.totalItems,
-        totalPages: spamMailList.totalPages
+        page: sentEmailList.page,
+        perPage: sentEmailList.size,
+        totalElements: sentEmailList.totalItems,
+        totalPages: sentEmailList.totalPages
       })
     }
   }
