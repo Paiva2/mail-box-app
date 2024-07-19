@@ -6,18 +6,11 @@
     tile
   >
     <template v-slot:subtitle>
-      <h1 class="text-h6">Sent</h1>
+      <h1 class="text-h6">{{ pageTitle }}</h1>
     </template>
 
     <generic-loading v-if="loading" />
-
-    <v-empty-state
-      v-else-if="!emailList.length"
-      headline="Nothing here..."
-      text="You haven't sent any e-mails yet. When you do, they'll appear here."
-      title="Check back later."
-      icon="mdi-email-off"
-    />
+    <slot v-else-if="!emailList.length" name="fallback"></slot>
 
     <v-infinite-scroll
       class="list"
@@ -38,7 +31,7 @@
             elevation="0"
             @click="selectEmailToPreview(email.id)"
           >
-            <v-avatar class="mr-3" :image="profile?.profilePicture ?? profile.defaultProfilePicture" color="surface-variant" />
+            <v-avatar class="mr-3" :image="email.emailOwnerPicture ?? profile.defaultProfilePicture" color="surface-variant" />
 
             <div class="d-flex btn-content-wrapper">
               <p class="mb-1 text-body-1 email-title">{{ email.subject }}</p>
@@ -71,85 +64,39 @@
 
 <script>
 import { mapState } from 'vuex'
-import { MutationTypes } from '@/lib/vuex/types/mutation-types'
-import { ActionTypes } from '@/lib/vuex/types/action-types'
-import GenericLoading from '@/components/genericLoading/GenericLoading'
-import api from '@/lib/axios'
 
 export default {
   name: 'EmailList',
-  components: {
-    GenericLoading
-  },
   props: {
-    filters: {
-      type: Object,
+    pageTitle: {
+      type: String,
       required: true
     },
     request: {
       type: Object,
       required: true
-    }
-  },
-  data() {
-    return {
-      selectedEmail: null,
-      loading: false
+    },
+    isLoadingOrEmpty: {
+      type: String,
+      required: true
+    },
+    loading: {
+      type: Boolean,
+      required: true
     }
   },
   computed: {
-    ...mapState(['auth', 'loadingEmailList', 'selectedEmailId', 'emailList', 'profile']),
+    ...mapState(['loadingEmailList', 'selectedEmailId', 'emailList', 'profile']),
     isLastPage() {
       return this.request.page === this.request.totalPages
     },
-    isLoadingOrEmpty() {
-      return (this.loading || !this.emailList.length) ? 'hide' : ''
-    }
-  },
-  async mounted() {
-    await this.getSentEmails(this.request.page, this.request.perPage)
   },
   methods: {
-    async getSentEmails(page, perPage) {
-      this.loading = true
-
-      try {
-        const sentEmails = await this.$store.dispatch(ActionTypes.GET_LIST.SENT, {
-          page: page,
-          perPage: perPage,
-          keyword: this.filters.searchValue
-        })
-
-        this.$emit('update:pagination', {
-          ...this.request,
-          page: sentEmails.page,
-          perPage: sentEmails.size,
-          totalElements: sentEmails.totalItems,
-          totalPages: sentEmails.totalPages
-        })
-
-        let currentEmails = []
-
-        if (this.emailList.length > 0) {
-          currentEmails = this.emailList.concat(sentEmails.emails)
-        } else {
-          currentEmails = sentEmails.emails
-        }
-
-        this.$store.commit(MutationTypes.EMAIL.SET_LIST, currentEmails)
-      } catch {
-        console.error('Error while fetching sent e-mails...')
-      } finally {
-        this.loading = false
-      }
-    },
     selectEmailToPreview(emailId) {
-      this.$store.commit(MutationTypes.EMAIL.SELECTED_ID, emailId)
-      this.$router.push({ name: 'emailSent', params: { emailId: emailId }  })
+      this.$emit("update:selectEmailPreview", emailId)
     },
-    async loadMore({done}) {
-        await this.getSentEmails(this.request.page + 1, this.request.perPage)
-        done()
+    loadMore() {
+      this.$emit("update:loadMore")
     }
   }
 }
