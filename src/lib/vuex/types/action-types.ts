@@ -4,6 +4,7 @@ export const ActionTypes = {
     INBOX: 'INBOX',
     SPAM: 'SPAM',
     SENT: 'SENT',
-    TRASH: 'TRASH'
+    TRASH: 'TRASH',
+    CONTACTS: 'CONTACTS'
   }
 }

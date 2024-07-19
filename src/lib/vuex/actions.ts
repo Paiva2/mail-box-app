@@ -57,7 +57,7 @@ export const actions = {
 
     return data
   },
-  async [ActionTypes.GET_LIST.SENT]({ commit, state }: ActionDefault, payload: { page: number, perPage: number, flag: string, keyword: string | null }) {
+  async [ActionTypes.GET_LIST.SENT]({ commit, state }: ActionDefault, payload: { page: number, perPage: number, keyword: string | null }) {
     let url = `/email/sent?page=${payload.page}&size=${payload.perPage}`
 
     if (payload.keyword != null && !!payload.keyword.length) {
@@ -72,11 +72,26 @@ export const actions = {
 
     return data
   },
-  async [ActionTypes.GET_LIST.TRASH]({ commit, state }: ActionDefault, payload: { page: number, perPage: number, flag: string, keyword: string | null }) {
+  async [ActionTypes.GET_LIST.TRASH]({ commit, state }: ActionDefault, payload: { page: number, perPage: number, keyword: string | null }) {
     let url = `/trashbin/me?page=${payload.page}&size=${payload.perPage}`
 
     if (payload.keyword != null && !!payload.keyword.length) {
       url += `&keyword=${payload.keyword}`
+    }
+
+    const { data } = await api.get(url, {
+      headers: {
+        Authorization: `Bearer ${state.auth.token}`
+      }
+    })
+
+    return data
+  },
+  async [ActionTypes.GET_LIST.CONTACTS]({ commit, state }: ActionDefault, payload: { page: number, perPage: number, name: string | null }) {
+    let url = `/contact/list?page=${payload.page}&size=${payload.perPage}`
+
+    if (payload.name != null && !!payload.name.length) {
+      url += `&name=${payload.name}`
     }
 
     const { data } = await api.get(url, {

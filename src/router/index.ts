@@ -9,6 +9,7 @@ import NoEmailSelected from "../views/noEmailSelected/NoEmailSelected.vue"
 import Spam from "../views/spam/Spam.vue"
 import Sent from "../views/sent/Sent.vue"
 import Trash from "../views/trash/Trash.vue"
+import Contacts from "../views/contacts/Contacts.vue"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -102,6 +103,14 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: Register,
+    },
+    {
+      path: '/contacts',
+      name: 'contacts',
+      component: Contacts,
+      meta: {
+        fallBackName: 'contacts',
+      },
     },
     {
       path: '/:catchAll(.*)',

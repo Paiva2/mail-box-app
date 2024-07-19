@@ -46,7 +46,7 @@
         title="Contacts"
         value="contacts"
         :active="selectedMenu === 'contacts'"
-        @click="selectedMenu = 'contacts'"
+        @click="goTo('contacts')"
       />
     </v-list>
 

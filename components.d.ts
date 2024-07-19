@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    ActionBar: typeof import('./src/components/actionBar/ActionBar.vue')['default']
     EmailActonBar: typeof import('./src/components/emailActionBar/EmailActonBar.vue')['default']
     EmailFallback: typeof import('./src/components/emailFallback/EmailFallback.vue')['default']
     EmailList: typeof import('./src/components/emailList/EmailList.vue')['default']
