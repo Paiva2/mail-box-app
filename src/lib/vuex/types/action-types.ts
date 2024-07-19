@@ -3,6 +3,7 @@ export const ActionTypes = {
   GET_LIST: {
     INBOX: 'INBOX',
     SPAM: 'SPAM',
-    SENT: 'SENT'
+    SENT: 'SENT',
+    TRASH: 'TRASH'
   }
 }

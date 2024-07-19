@@ -92,7 +92,7 @@ import { mapState } from 'vuex'
           {name: 'Important', value: 'important', icon: 'mdi-flag'},
           {name: 'Favourite', value: 'favourite', icon: 'mdi-star'},
           {name: 'Draft', value: 'draft', icon: 'mdi-file-document-edit'},
-          {name: 'Trash', value: 'trash', icon: 'mdi-delete'},
+          {name: 'Trash', value: 'noEmailSelectedTrash', icon: 'mdi-delete'},
         ]
       }
     },

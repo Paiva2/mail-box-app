@@ -53,7 +53,7 @@
             </div>
 
             <div class="d-flex align-center email-actions">
-              <v-tooltip text="Answer" location="top" v-if="!isFilteringSent">
+              <v-tooltip text="Answer" location="top" v-if="!hideAnswer">
                 <template v-slot:activator="{ props }">
                   <v-btn
                     v-bind="props"
@@ -80,7 +80,7 @@
         </div>
       </div>
 
-      <answer-email v-if="!isFilteringSent" :answerEmailForm="answerEmailForm" />
+      <answer-email v-if="!hideAnswer" :answerEmailForm="answerEmailForm" />
     </div>
 
     <v-empty-state
@@ -134,6 +134,9 @@ export default {
     ...mapState(['auth', 'profile']),
     isFilteringSent() {
       return this.$route.name === 'emailSent'
+    },
+    hideAnswer() {
+      return this.isFilteringSent || this.$route.name === 'emailTrash'
     }
   },
   async created() {
@@ -219,7 +222,7 @@ export default {
       })
     },
     handleAnswerForm() {
-      if(this.isFilteringSent) return
+      if(this.hideAnswer) return
 
       this.answerEmailForm.open = true
     }

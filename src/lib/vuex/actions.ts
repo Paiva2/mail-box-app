@@ -71,5 +71,20 @@ export const actions = {
     })
 
     return data
+  },
+  async [ActionTypes.GET_LIST.TRASH]({ commit, state }: ActionDefault, payload: { page: number, perPage: number, flag: string, keyword: string | null }) {
+    let url = `/trashbin/me?page=${payload.page}&size=${payload.perPage}`
+
+    if (payload.keyword != null && !!payload.keyword.length) {
+      url += `&keyword=${payload.keyword}`
+    }
+
+    const { data } = await api.get(url, {
+      headers: {
+        Authorization: `Bearer ${state.auth.token}`
+      }
+    })
+
+    return data
   }
 }
