@@ -213,7 +213,7 @@ export default {
       return fixListToGetMe
     },
     formatDate(date) {
-      return new Date(date)?.toLocaleDateString('pt-BR', {
+      return new Date(date)?.toLocaleDateString('en-US', {
         minute: "2-digit",
         hour: "2-digit",
         day: "2-digit",

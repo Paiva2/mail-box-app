@@ -1,101 +1,82 @@
 <template>
   <div class="d-flex contacts-container">
-    <p class="text-h4 text-grey-darken-2 font-weight-medium">Contacts</p>
+    <div class="d-flex align-center justify-space-between">
+      <p class="text-h5 text-grey-darken-2 font-weight-medium">Contacts</p>
 
-    <v-data-table
-      :headers="headers"
-      :items="desserts"
-      item-value="name"
-      items-per-page="5"
-      hide-default-footer
-      hover
-    >
-      <template v-slot:top>
-        <v-text-field
-          v-model="searchValue"
-          class="pa-3"
-          label="Search"
-          color="blue-darken-1"
-          variant="underlined"
-          prepend-icon="mdi-magnify"
-        ></v-text-field>
-      </template>
-    </v-data-table>
+      <v-btn @click="openFormDialog" size="38" color="blue-darken-1" icon="mdi-plus" elevation="1">
+      </v-btn>
+    </div>
+
+    <div>
+      <v-data-table
+        :headers="headers"
+        :items="contacts"
+        item-value="name"
+        items-per-page="5"
+        hide-default-footer
+        hover
+        class="elevation-1"
+      >
+        <template v-slot:top>
+          <v-text-field
+            v-model="searchValue"
+            class="pa-3"
+            label="Search"
+            color="blue-darken-1"
+            variant="underlined"
+            prepend-icon="mdi-magnify"
+          ></v-text-field>
+        </template>
+
+        <template v-slot:no-data>
+          <v-empty-state
+            class="py-10"
+            headline="Nothing here..."
+            text="You haven't added any contacts yet. When you do, they'll appear here."
+            title="Check back later."
+          >
+            <template v-slot:media>
+              <v-icon class="mb-3" size="60">mdi-contacts</v-icon>
+            </template>
+          </v-empty-state>
+        </template>
+
+        <template v-slot:[`item.createdAt`]="{ item }">
+            {{ formatDate(item.createdAt) }}
+        </template>
+      </v-data-table>
+    </div>
+
+    <contact-form :openForm="openForm" @update:close="closeForm" @update:list="updateList" />
   </div>
 </template>
-
+s
 <script>
 import { mapState } from 'vuex'
 import { MutationTypes } from '@/lib/vuex/types/mutation-types'
 import { ActionTypes } from '@/lib/vuex/types/action-types'
+import ContactForm from './contactForm/ContactForm'
 
 export default {
   name: 'Contacts',
+  components: {
+    ContactForm
+  },
   data () {
     return {
+      openForm: false,
       headers: [
         { title: 'Name', align: 'start', key: 'name', sortable: false },
         { title: 'E-mail', align: 'center', key: 'email', sortable: false  },
         { title: 'Created in', align: 'end', key: 'createdAt', sortable: false  },
       ],
-      contacts: [
-        {
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-        },
-        {
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-        },
-        {
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-        },
-        {
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-        },
-        {
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-        },
-        {
-          calories: 375,
-          fat: 0.0,
-          carbs: 94
-        },
-        {
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-        },
-        {
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-
-        },
-        {
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-
-        },
-        {
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-        },
-      ],
+      contacts: [],
       pagination: {
         page: 1,
         perPage: 15,
         keyword: '',
+        totalItems: 0,
+        totalPages: 0
       },
       searchValue: ''
     }
@@ -110,6 +91,31 @@ export default {
         perPage,
         keyword
       })
+
+      this.contacts = list.contacts
+      this.pagination = {
+        ...this.pagination,
+        page: list.page,
+        perPage: list.size,
+        totalItems: list.totalItems,
+        totalPages: list.totalPages
+      }
+    },
+    openFormDialog() {
+      this.openForm = true
+    },
+    closeForm() {
+      this.openForm = false
+    },
+    formatDate(date) {
+      return new Date(date)?.toLocaleDateString('en-US', {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      })
+    },
+    async updateList() {
+      await this.getContactsList(1, 15, '')
     }
   }
 }
