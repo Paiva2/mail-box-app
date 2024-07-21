@@ -9,10 +9,11 @@
 
     <div>
       <v-data-table
+        :page="pagination.page"
         :headers="headers"
         :items="contacts"
+        :items-per-page="pagination.perPage"
         item-value="name"
-        items-per-page="5"
         hide-default-footer
         hover
         class="elevation-1 pa-3"
@@ -26,6 +27,20 @@
             variant="underlined"
             prepend-icon="mdi-magnify"
           />
+
+          <div class="d-flex align-center w-100 justify-end">
+              <p class="mr-3 font-weight-medium">Items per page: </p>
+              <v-select
+                :items="perPageOptions"
+                v-model="pagination.perPage"
+                @update:model-value="handlePagination"
+                variant="solo"
+                max-width="100"
+                density="compact"
+                item-color="blue-darken-1"
+                hide-details
+              />
+          </div>
         </template>
 
         <template v-slot:no-data>
@@ -61,6 +76,20 @@
                 @click="openConfirmDelete(item)"
               />
             </div>
+        </template>
+
+        <template v-slot:bottom>
+          <div class="text-center pt-8">
+            <v-pagination
+              v-model="pagination.page"
+              :length="pagination.totalPages"
+              active-color="blue-darken-1"
+              size="45"
+              :total-visible="5"
+              elevation="1"
+              @update:model-value="handlePagination"
+            />
+          </div>
         </template>
       </v-data-table>
     </div>
@@ -110,10 +139,11 @@ export default {
         { title: 'Created in', align: 'end', key: 'createdAt', sortable: false  },
         { title: '', align: 'end', key: 'actions', sortable: false  },
       ],
+      perPageOptions: ['5', '10', '15', '20'],
       contacts: [],
       pagination: {
         page: 1,
-        perPage: 15,
+        perPage: 10,
         keyword: '',
         totalItems: 0,
         totalPages: 0
@@ -187,6 +217,9 @@ export default {
     },
     closeConfirmDelete() {
       this.openConfirmDeleteDialog = false
+    },
+    async handlePagination() {
+      await this.getContactsList(this.pagination.page, this.pagination.perPage, this.pagination.keyword)
     }
   }
 }
