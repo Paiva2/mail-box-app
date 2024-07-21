@@ -15,7 +15,7 @@
         items-per-page="5"
         hide-default-footer
         hover
-        class="elevation-1"
+        class="elevation-1 pa-3"
       >
         <template v-slot:top>
           <v-text-field
@@ -25,7 +25,7 @@
             color="blue-darken-1"
             variant="underlined"
             prepend-icon="mdi-magnify"
-          ></v-text-field>
+          />
         </template>
 
         <template v-slot:no-data>
@@ -44,31 +44,71 @@
         <template v-slot:[`item.createdAt`]="{ item }">
             {{ formatDate(item.createdAt) }}
         </template>
+
+        <template v-slot:[`item.actions`]="{ item }">
+            <div class="d-flex w-100 justify-end actions-wrapper">
+              <v-btn
+                size="32"
+                variant="tonal"
+                color="blue-darken-4"
+                icon="mdi-pencil"
+                @click="openEdit(item)"
+              />
+              <v-btn
+                size="32"
+                variant="tonal"
+                icon="mdi-delete"
+                @click="openConfirmDelete(item)"
+              />
+            </div>
+        </template>
       </v-data-table>
     </div>
 
-    <contact-form :openForm="openForm" @update:close="closeForm" @update:list="updateList" />
+    <contact-form
+      :editing="editing"
+      :formFields="formFields"
+      :openForm="openForm"
+      :contactEditing="contactEditing"
+      @update:close="closeForm"
+      @update:list="updateList"
+    />
+
+    <confirm-delete
+      :contact="contactToDelete"
+      :openConfirmDeleteDialog="openConfirmDeleteDialog"
+      @update:close="closeConfirmDelete"
+      @update:list="updateList"
+    />
   </div>
 </template>
-s
+
 <script>
 import { mapState } from 'vuex'
 import { MutationTypes } from '@/lib/vuex/types/mutation-types'
 import { ActionTypes } from '@/lib/vuex/types/action-types'
 import ContactForm from './contactForm/ContactForm'
+import ConfirmDelete from './confirmDelete/ConfirmDelete'
 
 export default {
   name: 'Contacts',
   components: {
-    ContactForm
+    ContactForm,
+    ConfirmDelete
   },
   data () {
     return {
       openForm: false,
+      formFields: {
+        name: '',
+        email: ''
+      },
+      contactEditing: null,
       headers: [
         { title: 'Name', align: 'start', key: 'name', sortable: false },
         { title: 'E-mail', align: 'center', key: 'email', sortable: false  },
         { title: 'Created in', align: 'end', key: 'createdAt', sortable: false  },
+        { title: '', align: 'end', key: 'actions', sortable: false  },
       ],
       contacts: [],
       pagination: {
@@ -78,7 +118,10 @@ export default {
         totalItems: 0,
         totalPages: 0
       },
-      searchValue: ''
+      searchValue: '',
+      editing: false,
+      openConfirmDeleteDialog: false,
+      contactToDelete: null
     }
   },
   async created() {
@@ -103,6 +146,12 @@ export default {
     },
     openFormDialog() {
       this.openForm = true
+      this.editing = false
+      this.formFields = {
+        name: '',
+        email: ''
+      }
+      this.contactEditing = null
     },
     closeForm() {
       this.openForm = false
@@ -116,6 +165,28 @@ export default {
     },
     async updateList() {
       await this.getContactsList(1, 15, '')
+    },
+    openEdit(contact) {
+      this.formFields = {
+        name: contact.name,
+        email: contact.email
+      }
+
+      this.contactEditing = {
+        id: contact.id,
+        name: contact.name,
+        email: contact.email
+      }
+
+      this.editing = true
+      this.openForm = true
+    },
+    openConfirmDelete(contact) {
+      this.openConfirmDeleteDialog = true
+      this.contactToDelete = contact
+    },
+    closeConfirmDelete() {
+      this.openConfirmDeleteDialog = false
     }
   }
 }
@@ -126,5 +197,9 @@ export default {
     flex-direction: column;
     padding: 1.25rem;
     gap: .9375rem;
+  }
+
+  .actions-wrapper {
+    gap: .625rem;
   }
 </style>
