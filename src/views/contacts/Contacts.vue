@@ -26,6 +26,7 @@
             color="blue-darken-1"
             variant="underlined"
             prepend-icon="mdi-magnify"
+            @blur="handleSearch"
           />
 
           <div class="d-flex align-center w-100 justify-end">
@@ -37,7 +38,6 @@
                 variant="solo"
                 max-width="100"
                 density="compact"
-                item-color="blue-darken-1"
                 hide-details
               />
           </div>
@@ -144,25 +144,25 @@ export default {
       pagination: {
         page: 1,
         perPage: 10,
-        keyword: '',
         totalItems: 0,
         totalPages: 0
       },
       searchValue: '',
+      searchingState: false,
       editing: false,
       openConfirmDeleteDialog: false,
       contactToDelete: null
     }
   },
   async created() {
-    await this.getContactsList(this.pagination.page, this.pagination.perPage, this.pagination.keyword)
+    await this.getContactsList(this.pagination.page, this.pagination.perPage, this.searchValue)
   },
   methods: {
     async getContactsList(page, perPage, keyword) {
       const list = await this.$store.dispatch(ActionTypes.GET_LIST.CONTACTS, {
         page,
         perPage,
-        keyword
+        name: keyword
       })
 
       this.contacts = list.contacts
@@ -219,7 +219,18 @@ export default {
       this.openConfirmDeleteDialog = false
     },
     async handlePagination() {
-      await this.getContactsList(this.pagination.page, this.pagination.perPage, this.pagination.keyword)
+      await this.getContactsList(this.pagination.page, this.pagination.perPage, this.searchValue)
+    },
+    async handleSearch() {
+      if(!this.searchingState && !this.searchValue) return
+
+      if(this.searchingState && !this.searchValue) {
+        this.searchingState = false
+      } else {
+        this.searchingState = true
+      }
+
+      await this.getContactsList(this.pagination.page, this.pagination.perPage, this.searchValue)
     }
   }
 }
