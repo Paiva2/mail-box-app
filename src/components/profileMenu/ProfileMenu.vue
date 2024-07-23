@@ -32,13 +32,23 @@
             </div>
 
             <div class="fields-wrapper d-flex pa-0">
-              <span class="profile-picture">
-                <label class="profile-input-label">
-                  <input @change="changeProfilePicture" class="profile-input" type="file" />
-                  <img :src="handleProfilePictureToShow" />
-                  <div class="profile-icon"></div>
-                </label>
-              </span>
+              <div class="d-flex align-center justify-center picture-wrapper">
+                <span class="profile-picture">
+                  <label class="profile-input-label">
+                    <input @change="changeProfilePicture" class="profile-input" type="file" />
+                    <img :src="handleProfilePictureToShow" />
+                    <div class="profile-icon"></div>
+                  </label>
+                </span>
+                <v-btn
+                  prepend-icon="mdi-delete"
+                  max-width="160" elevation="1"
+                  flat text="Remove"
+                  color="red"
+                  @click="removeProfilePicture"
+                />
+              </div>
+
 
               <v-text-field
                 hide-details="auto"
@@ -46,10 +56,7 @@
                 type="text"
                 variant="underlined"
                 color="blue-darken-3"
-                readonly
                 v-model="formFields.name"
-                hint="Username is not updatable"
-                persistent-hint
               />
 
               <v-text-field
@@ -62,6 +69,9 @@
                 validate-on="submit"
                 v-model="formFields.email"
                 :rules="emailRules"
+                hint="E-mail is not updatable"
+                persistent-hint
+                readonly
               />
 
               <v-text-field
@@ -225,8 +235,6 @@ export default {
       try {
         const body = await this.handleBodyDefaults()
 
-        if (!body.password && !body.email && !body.profilePicture) return
-
         await api.patch('/user/update', body, {
           headers: {
             Authorization: `Bearer ${this.auth.token}`
@@ -236,8 +244,6 @@ export default {
         this.refreshProfile()
         this.toast.success('Updated successfully!');
       } catch (e) {
-        console.error(e)
-
         if(e instanceof AxiosError) {
           if (e.response.status === 409) {
             return this.toast.error('E-mail already being used!');
@@ -271,38 +277,43 @@ export default {
       this.showConfirmPassword = !this.showConfirmPassword
     },
     changeProfilePicture(event) {
-      //this.formFields.profilePicture = event?.target?.files[0];
+      this.formFields.profilePicture = event?.target?.files[0];
     },
     async handleBodyDefaults() {
       const body = {}
 
-      if (this.formFields.email !== this.profile.email) {
-        body.email = this.formFields.email
+      if (this.formFields.name !== this.profile.name) {
+        body.name = this.formFields.name
       }
 
       if (this.formFields.password !== '') {
         body.password = this.formFields.password
       }
 
-      // TODO
-      if (this.formFields.profilePicture !== '') {
+      if (this.formFields.profilePicture) {
         const multipartFile = new FormData();
 
-        multipartFile.append("file", this.formFields.profilePicture);
+        multipartFile.append("picture", this.formFields.profilePicture);
 
-        const uploadImage = await api.post("/user/picture", multipartFile, {
+        const uploadImage = await api.patch("/user/profile-picture", multipartFile, {
           headers: {
             Authorization: `Bearer ${this.auth.token}`
           }
         });
 
-        body.profilePicture = uploadImage.data.url;
+        body.profilePicture = uploadImage.data.profilePictureUrl;
+      } else {
+        body.profilePicture = null
       }
 
       return body
     },
     refreshProfile() {
       this.$store.dispatch(ActionTypes.SET_PROFILE)
+    },
+    removeProfilePicture() {
+      this.formFields.profilePicture = null
+      this.profile.profilePicture = null
     }
   }
 }
@@ -407,6 +418,11 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .picture-wrapper {
+    flex-direction: column;
+    gap: .9375rem;
   }
 
 </style>
