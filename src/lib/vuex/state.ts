@@ -17,6 +17,7 @@ export const state: IState = {
   stompClient: null,
   loadingEmailList: false,
   selectedEmailId: null,
+  emailBeingVisualized: null,
   emailList: [],
 }
 

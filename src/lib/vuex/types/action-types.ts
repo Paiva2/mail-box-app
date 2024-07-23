@@ -5,6 +5,7 @@ export const ActionTypes = {
     SPAM: 'SPAM',
     SENT: 'SENT',
     TRASH: 'TRASH',
-    CONTACTS: 'CONTACTS'
+    CONTACTS: 'CONTACTS',
+    DRAFT: 'DRAFT'
   }
 }

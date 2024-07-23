@@ -57,6 +57,21 @@ export const actions = {
 
     return data
   },
+  async [ActionTypes.GET_LIST.DRAFT]({ commit, state }: ActionDefault, payload: { page: number, perPage: number, keyword: string | null }) {
+    let url = `/email/drafts?page=${payload.page}&size=${payload.perPage}`
+
+    if (payload.keyword != null && !!payload.keyword.length) {
+      url += `&keyword=${payload.keyword}`
+    }
+
+    const { data } = await api.get(url, {
+      headers: {
+        Authorization: `Bearer ${state.auth.token}`
+      }
+    })
+
+    return data
+  },
   async [ActionTypes.GET_LIST.SENT]({ commit, state }: ActionDefault, payload: { page: number, perPage: number, keyword: string | null }) {
     let url = `/email/sent?page=${payload.page}&size=${payload.perPage}`
 

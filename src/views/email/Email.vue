@@ -47,7 +47,7 @@
 
                 <span class="text-body-2 text-grey-darken-1 font-weight-regular to-list">
                   <span class="text-grey-darken-1">Send at: </span>
-                    {{ formatDate(email.createdAt) }}h
+                    {{ formatDate(email.createdAt) }}
                 </span>
               </div>
             </div>
@@ -132,11 +132,11 @@ export default {
   },
   computed: {
     ...mapState(['auth', 'profile']),
-    isFilteringSent() {
-      return this.$route.name === 'emailSent'
+    isFilteringSentOrDraft() {
+      return this.$route.name === 'emailSent' || this.$route.name === 'emailDraft'
     },
     hideAnswer() {
-      return this.isFilteringSent || this.$route.name === 'emailTrash'
+      return this.isFilteringSentOrDraft || this.$route.name === 'emailTrash'
     }
   },
   async created() {
@@ -158,7 +158,7 @@ export default {
 
       let url = null
 
-      if (this.isFilteringSent) {
+      if (this.isFilteringSentOrDraft) {
         url = '/email/sent'
       } else {
         url = '/email/me'
@@ -178,14 +178,16 @@ export default {
           message: email.data.message,
           title: email.data.subject,
           createdAt: email.data.createdAt,
-          from: this.isFilteringSent ? 'Me' : email.data.sendFrom,
-          fromName: this.isFilteringSent ? 'Me' : email.data.sendFromName,
+          from: this.isFilteringSentOrDraft ? 'Me' : email.data.sendFrom,
+          fromName: this.isFilteringSentOrDraft ? 'Me' : email.data.sendFromName,
           usersReceiving: this.formatReceivingList(email.data.usersReceivingEmailOutput),
           isSpam: email.data.isSpam ?? null,
           attachments: email.data.attachments,
           copies: this.formatReceivingList(email.data.ccs),
-          sendFromProfilePicture: this.isFilteringSent ? this.profile.profilePicture : email.data.sendFromProfilePicture
+          sendFromProfilePicture: this.isFilteringSentOrDraft ? this.profile.profilePicture : email.data.sendFromProfilePicture
         }
+
+        this.$store.commit(MutationTypes.EMAIL.SELECTED_EMAIL, this.email)
       } catch (e){
         console.error(e)
         console.log("Error while fetching e-mail...")

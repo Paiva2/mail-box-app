@@ -31,4 +31,6 @@ export interface IState {
   loadingEmailList: boolean
   selectedEmailId: string | null
   emailList: EmailList[]
+  // FIX TYPE
+  emailBeingVisualized: null | any
 }

@@ -10,6 +10,7 @@ import Spam from "../views/spam/Spam.vue"
 import Sent from "../views/sent/Sent.vue"
 import Trash from "../views/trash/Trash.vue"
 import Contacts from "../views/contacts/Contacts.vue"
+import Draft from "../views/draft/Draft.vue"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -70,6 +71,26 @@ const router = createRouter({
         {
           path: ':emailId',
           name: 'emailSpam',
+          component: Email,
+        },
+      ]
+    },
+    {
+      path: '/draft',
+      name: 'draft',
+      component: Draft,
+      meta: {
+        fallBackName: 'noEmailSelectedDraft',
+      },
+      children: [
+        {
+          path: '',
+          name: 'noEmailSelectedDraft',
+          component: NoEmailSelected,
+        },
+        {
+          path: ':emailId',
+          name: 'emailDraft',
           component: Email,
         },
       ]
